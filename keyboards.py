@@ -2,7 +2,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 # URL вашего GitHub Pages (обновите после деплоя)
 # Формат: https://username.github.io/repository-name/
-WEBAPP_URL = "https://YOUR_USERNAME.github.io/school-bot-webapp/"
+WEBAPP_URL = "https://vividlyvividlife.github.io/school-bot/"
 
 
 # ============ MAIN MENUS ============
