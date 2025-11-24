@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+deploy.log
+
+# Environment variables
+.env
+.env.backup
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Bot specific
+bot_token.txt
+
+# Deployment scripts (не нужны в репозитории, они на сервере)
+# deploy_vds.sh уже будет на сервере
+
+# Временные файлы
+*.tmp
+*.bak

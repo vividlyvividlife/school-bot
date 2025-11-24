@@ -1,0 +1,38 @@
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Git
+.git/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Не нужные для GitHub Pages
+bot.py
+bot_with_webapp.py
+webapp_server.py
+database.py
+config.py
+handlers/
+utils/
+test_db.py
+requirements.txt
+*.md
+!README.md
