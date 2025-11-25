@@ -118,20 +118,33 @@
         </div>
     </div>
 
+    <script src="js/demo-data.js"></script>
     <script src="js/api.js"></script>
     <script src="js/teacher.js"></script>
     <script src="js/parent.js"></script>
     <script src="js/student.js"></script>
     <script>
         // Initialize Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+        let tg = null;
+        let userId = null;
+        let userName = 'User';
 
-        // Get user data from Telegram
-        const initData = tg.initDataUnsafe;
-        const userId = initData.user?.id;
-        const userName = initData.user?.first_name || 'User';
+        // Проверяем доступность Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+            tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.ready();
+
+            // Get user data from Telegram
+            const initData = tg.initDataUnsafe;
+            userId = initData.user?.id;
+            userName = initData.user?.first_name || 'User';
+        } else {
+            // Демо-режим: используем тестовые данные
+            console.log('🔧 Работаем в демо-режиме (вне Telegram)');
+            userId = 12345; // Демо user_id
+            userName = 'Демо Пользователь';
+        }
 
         // Get role from URL parameter
         const urlParams = new URLSearchParams(window.location.search);

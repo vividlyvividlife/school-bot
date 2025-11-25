@@ -2,8 +2,28 @@
 // Работает через Telegram WebApp API
 
 const API = {
+    // Проверка, запущено ли приложение в Telegram
+    isTelegramWebApp() {
+        return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData;
+    },
+
+    // Проверка демо-режима
+    isDemoMode() {
+        return !this.isTelegramWebApp() && typeof DEMO_DATA !== 'undefined';
+    },
+
     // Получение данных пользователя из Telegram
     getUserData(userId) {
+        // Если демо-режим, возвращаем тестовые данные
+        if (this.isDemoMode()) {
+            return {
+                user_id: userId || 12345,
+                username: 'demo_user',
+                full_name: 'Демо Пользователь',
+                role: this.getRoleFromParam(null)
+            };
+        }
+
         // Данные передаются через initData от Telegram
         const tg = window.Telegram.WebApp;
         const user = tg.initDataUnsafe.user;
@@ -77,6 +97,10 @@ const API = {
 
     // Получение списка учеников
     async getStudents() {
+        if (this.isDemoMode()) {
+            return DEMO_DATA.students;
+        }
+
         const cached = await this.getFromStorage('students');
         if (cached) return cached;
 
@@ -91,6 +115,10 @@ const API = {
     },
 
     async getSubjects() {
+        if (this.isDemoMode()) {
+            return DEMO_DATA.subjects;
+        }
+
         const cached = await this.getFromStorage('subjects');
         if (cached) return cached;
 
@@ -99,6 +127,10 @@ const API = {
     },
 
     async getGrades(studentId) {
+        if (this.isDemoMode()) {
+            return DEMO_DATA.grades[studentId] || [];
+        }
+
         const cached = await this.getFromStorage(`grades_${studentId}`);
         if (cached) return cached;
 
@@ -126,6 +158,10 @@ const API = {
     },
 
     async getHomework() {
+        if (this.isDemoMode()) {
+            return DEMO_DATA.homework;
+        }
+
         const cached = await this.getFromStorage('homework');
         if (cached) return cached;
 
@@ -134,6 +170,14 @@ const API = {
     },
 
     async getStatistics(studentId) {
+        if (this.isDemoMode()) {
+            return DEMO_DATA.statistics[studentId] || {
+                overall_average: 0,
+                total_grades: 0,
+                subject_averages: {}
+            };
+        }
+
         const cached = await this.getFromStorage(`stats_${studentId}`);
         if (cached) return cached;
 
@@ -146,6 +190,11 @@ const API = {
     },
 
     async getParentStudents(parentId) {
+        if (this.isDemoMode()) {
+            const studentIds = DEMO_DATA.parent_students[parentId] || [];
+            return DEMO_DATA.students.filter(s => studentIds.includes(s.student_id));
+        }
+
         const cached = await this.getFromStorage(`parent_students_${parentId}`);
         if (cached) return cached;
 
