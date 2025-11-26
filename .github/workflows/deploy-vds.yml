@@ -21,33 +21,13 @@ jobs:
           script: |
             echo "=== Starting Auto-Deploy ==="
             
-            # 1. Переходим в папку
+            # Переходим в папку и запускаем скрипт деплоя
             cd /botSchool || exit 1
             
-            # 2. Обновляем код (принудительно)
-            git fetch origin main
-            git reset --hard origin/main
+            # Делаем скрипт исполняемым (на всякий случай)
+            chmod +x deploy_vds.sh
             
-            # 3. Настраиваем окружение
-            if [ ! -d "venv" ]; then
-                python3 -m venv venv
-            fi
-            
-            source venv/bin/activate
-            pip install -r requirements.txt
-            
-            # 4. Перезапускаем бота
-            echo "Restarting bot..."
-            screen -X -S school_bot quit || true
-            screen -dmS school_bot bash -c "source venv/bin/activate && python bot.py"
-            
-            # 5. Проверка
-            sleep 3
-            if screen -ls | grep -q "school_bot"; then
-                echo "✅ Bot started successfully!"
-            else
-                echo "❌ Bot failed to start!"
-                exit 1
-            fi
+            # Запускаем скрипт деплоя
+            bash deploy_vds.sh
             
             echo "=== Deploy Finished ==="
