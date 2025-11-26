@@ -52,7 +52,7 @@ fi
 
 # Запускаем бота в screen
 echo "Starting bot in screen session..."
-screen -dmS school_bot bash -c "source venv/bin/activate && python bot.py"
+screen -dmS school_bot bash -c "source venv/bin/activate && python bot_with_webapp.py"
 
 # Проверяем, запустился ли screen
 sleep 2
