@@ -11,6 +11,9 @@ echo "Changed to directory: $(pwd)"
 # Останавливаем текущую screen сессию если она есть
 echo "Stopping existing screen session..."
 screen -X -S school_bot quit || true
+# Принудительно убиваем старые процессы, если они зависли
+pkill -f "python bot_with_webapp.py" || true
+pkill -f "python bot.py" || true
 
 # Сохраняем текущие настройки если нужно
 if [ -f .env ]; then
