@@ -15,7 +15,9 @@ class Database:
 
     def get_connection(self):
         """Создает подключение к базе данных"""
-        conn = sqlite3.connect(self.db_path)
+        # check_same_thread=False нужен, так как мы используем asyncio.to_thread
+        # timeout=10 увеличивает время ожидания разблокировки базы
+        conn = sqlite3.connect(self.db_path, check_same_thread=False, timeout=10.0)
         conn.row_factory = sqlite3.Row
         return conn
 
