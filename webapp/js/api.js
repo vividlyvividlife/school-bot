@@ -1,8 +1,11 @@
 // API helper для связи с Backend сервером
 // Работает через REST API
 
+// Конфигурация: URL VDS сервера где запущен бот с API
+const API_BASE_URL = 'http://45.147.178.113:8080';
+
 const API = {
-    baseUrl: window.location.origin, // автоматически получаем базовый URL
+    baseUrl: API_BASE_URL, // используем URL VDS сервера
 
     // Проверка, запущено ли приложение в Telegram
     isTelegramWebApp() {
