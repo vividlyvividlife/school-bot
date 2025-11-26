@@ -4,6 +4,9 @@ async function initTeacherInterface(userId) {
     const teacherInterface = document.getElementById('teacher-interface');
     teacherInterface.style.display = 'block';
 
+    // Сохраняем ID учителя для использования в других функциях
+    window.currentTeacherId = userId;
+
     // Load students
     await loadStudents();
 
@@ -22,7 +25,7 @@ async function loadStudents() {
         students.forEach(student => {
             const option = document.createElement('option');
             option.value = student.student_id;
-            option.textContent = `${student.full_name} (${student.class_name})`;
+            option.textContent = `${student.full_name} (${student.class_name || 'Не указан'})`;
             select.appendChild(option);
         });
 
@@ -153,7 +156,9 @@ async function addNewGrade(studentId, subjectId) {
     const comment = prompt('Комментарий (необязательно):');
 
     try {
-        const success = await API.addGrade(studentId, subjectId, gradeValue, comment);
+        // Используем teacher_id из глобальной переменной
+        const teacherId = window.currentTeacherId || 1;
+        const success = await API.addGrade(studentId, subjectId, gradeValue, comment, teacherId);
         if (success) {
             API.showAlert('Оценка добавлена!');
             await loadStudentGrades(studentId);

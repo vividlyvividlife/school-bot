@@ -386,6 +386,23 @@ class Database:
         conn.close()
         return [dict(row) for row in rows]
 
+    def update_grade(self, grade_id: int, grade: int, comment: Optional[str] = None) -> bool:
+        """Обновление оценки"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                'UPDATE grades SET grade = ?, comment = ? WHERE grade_id = ?',
+                (grade, comment, grade_id)
+            )
+            conn.commit()
+            conn.close()
+            logger.info(f"Grade {grade_id} updated to {grade}")
+            return True
+        except Exception as e:
+            logger.error(f"Error updating grade: {e}")
+            return False
+
     # ============ HOMEWORK METHODS ============
     
     def add_homework(self, subject_id: int, title: str, description: str,

@@ -1,7 +1,9 @@
-// API helper для связи с Telegram Bot
-// Работает через Telegram WebApp API
+// API helper для связи с Backend сервером
+// Работает через REST API
 
 const API = {
+    baseUrl: window.location.origin, // автоматически получаем базовый URL
+
     // Проверка, запущено ли приложение в Telegram
     isTelegramWebApp() {
         return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData;
@@ -50,124 +52,120 @@ const API = {
         return 'parent';
     },
 
-    // Отправка данных обратно в бот
-    sendDataToBot(action, data) {
-        const tg = window.Telegram.WebApp;
-        const payload = {
-            action: action,
-            data: data,
-            timestamp: Date.now()
+    // ============ HTTP REQUEST HELPERS ============
+
+    async apiRequest(method, endpoint, data = null) {
+        const options = {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
         };
 
-        // Отправка данных боту
-        tg.sendData(JSON.stringify(payload));
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        try {
+            const response = await fetch(`${this.baseUrl}${endpoint}`, options);
+            const result = await response.json();
+
+            if (!result.success) {
+                console.error('API Error:', result.error);
+                throw new Error(result.error || 'API request failed');
+            }
+
+            return result.data;
+        } catch (error) {
+            console.error('Request error:', error);
+            throw error;
+        }
     },
 
-    // Получение данных через CloudStorage (Telegram)
-    async getFromStorage(key) {
-        return new Promise((resolve) => {
-            window.Telegram.WebApp.CloudStorage.getItem(key, (error, value) => {
-                if (error) {
-                    console.error('Storage error:', error);
-                    resolve(null);
-                } else {
-                    resolve(value ? JSON.parse(value) : null);
-                }
-            });
-        });
-    },
+    // ============ STUDENTS ============
 
-    // Сохранение данных в CloudStorage
-    async saveToStorage(key, value) {
-        return new Promise((resolve) => {
-            window.Telegram.WebApp.CloudStorage.setItem(
-                key,
-                JSON.stringify(value),
-                (error, success) => {
-                    if (error) {
-                        console.error('Storage error:', error);
-                        resolve(false);
-                    } else {
-                        resolve(true);
-                    }
-                }
-            );
-        });
-    },
-
-    // Получение списка учеников
     async getStudents() {
         if (this.isDemoMode()) {
             return DEMO_DATA.students;
         }
 
-        const cached = await this.getFromStorage('students');
-        if (cached) return cached;
-
-        // Если нет в кеше, запрашиваем у бота
-        this.requestDataFromBot('get_students');
-        return [];
+        return await this.apiRequest('GET', '/api/students');
     },
 
     async getStudent(studentId) {
-        const students = await this.getStudents();
-        return students.find(s => s.student_id === studentId);
+        if (this.isDemoMode()) {
+            const students = DEMO_DATA.students;
+            return students.find(s => s.student_id === studentId);
+        }
+
+        return await this.apiRequest('GET', `/api/students/${studentId}`);
     },
 
-    async getSubjects() {
+    // ============ SUBJECTS ============
+
+    async getSubjects(teacherId = null) {
         if (this.isDemoMode()) {
             return DEMO_DATA.subjects;
         }
 
-        const cached = await this.getFromStorage('subjects');
-        if (cached) return cached;
-
-        this.requestDataFromBot('get_subjects');
-        return [];
+        const endpoint = teacherId ? `/api/subjects?teacher_id=${teacherId}` : '/api/subjects';
+        return await this.apiRequest('GET', endpoint);
     },
+
+    // ============ GRADES ============
 
     async getGrades(studentId) {
         if (this.isDemoMode()) {
             return DEMO_DATA.grades[studentId] || [];
         }
 
-        const cached = await this.getFromStorage(`grades_${studentId}`);
-        if (cached) return cached;
-
-        this.requestDataFromBot('get_grades', { student_id: studentId });
-        return [];
+        return await this.apiRequest('GET', `/api/grades?student_id=${studentId}`);
     },
 
-    async addGrade(studentId, subjectId, grade, comment) {
-        this.sendDataToBot('add_grade', {
+    async addGrade(studentId, subjectId, grade, comment = '', teacherId = 1) {
+        if (this.isDemoMode()) {
+            console.log('Demo mode: Grade not saved');
+            return true;
+        }
+
+        await this.apiRequest('POST', '/api/grades', {
             student_id: studentId,
             subject_id: subjectId,
             grade: grade,
-            comment: comment
+            comment: comment,
+            teacher_id: teacherId,
+            date: new Date().toISOString().split('T')[0]
         });
+
         return true;
     },
 
-    async updateGrade(gradeId, newGrade, comment) {
-        this.sendDataToBot('update_grade', {
-            grade_id: gradeId,
+    async updateGrade(gradeId, newGrade, comment = '') {
+        if (this.isDemoMode()) {
+            console.log('Demo mode: Grade not updated');
+            return true;
+        }
+
+        await this.apiRequest('PUT', `/api/grades/${gradeId}`, {
             grade: newGrade,
             comment: comment
         });
+
         return true;
     },
 
-    async getHomework() {
+    // ============ HOMEWORK ============
+
+    async getHomework(subjectId = null) {
         if (this.isDemoMode()) {
             return DEMO_DATA.homework;
         }
 
-        const cached = await this.getFromStorage('homework');
-        if (cached) return cached;
-
-        this.requestDataFromBot('get_homework');
-        return [];
+        const endpoint = subjectId ? `/api/homework?subject_id=${subjectId}` : '/api/homework';
+        return await this.apiRequest('GET', endpoint);
     },
+
+    // ============ STATISTICS ============
 
     async getStatistics(studentId) {
         if (this.isDemoMode()) {
@@ -178,16 +176,10 @@ const API = {
             };
         }
 
-        const cached = await this.getFromStorage(`stats_${studentId}`);
-        if (cached) return cached;
-
-        this.requestDataFromBot('get_statistics', { student_id: studentId });
-        return {
-            overall_average: 0,
-            total_grades: 0,
-            subject_averages: {}
-        };
+        return await this.apiRequest('GET', `/api/statistics?student_id=${studentId}`);
     },
+
+    // ============ PARENT STUDENTS ============
 
     async getParentStudents(parentId) {
         if (this.isDemoMode()) {
@@ -195,38 +187,49 @@ const API = {
             return DEMO_DATA.students.filter(s => studentIds.includes(s.student_id));
         }
 
-        const cached = await this.getFromStorage(`parent_students_${parentId}`);
-        if (cached) return cached;
-
-        this.requestDataFromBot('get_parent_students', { parent_id: parentId });
-        return [];
+        return await this.apiRequest('GET', `/api/parent/${parentId}/students`);
     },
 
-    // Запрос данных у бота
-    requestDataFromBot(action, params = {}) {
-        // Закрываем Mini App и отправляем команду боту
-        // Бот обработает команду и откроет Mini App заново с данными
-        const command = `/${action}`;
-        window.Telegram.WebApp.close();
-    },
+    // ============ TELEGRAM HELPERS ============
 
     // Показать уведомление
     showAlert(message) {
-        window.Telegram.WebApp.showAlert(message);
+        if (this.isTelegramWebApp()) {
+            window.Telegram.WebApp.showAlert(message);
+        } else {
+            alert(message);
+        }
     },
 
     // Показать подтверждение
     async showConfirm(message) {
-        return new Promise((resolve) => {
-            window.Telegram.WebApp.showConfirm(message, resolve);
-        });
+        if (this.isTelegramWebApp()) {
+            return new Promise((resolve) => {
+                window.Telegram.WebApp.showConfirm(message, resolve);
+            });
+        } else {
+            return confirm(message);
+        }
     },
 
     // Показать всплывающее уведомление
     showPopup(message) {
-        window.Telegram.WebApp.showPopup({
-            message: message
-        });
+        if (this.isTelegramWebApp()) {
+            window.Telegram.WebApp.showPopup({
+                message: message
+            });
+        } else {
+            alert(message);
+        }
+    },
+
+    // Закрыть Mini App
+    close() {
+        if (this.isTelegramWebApp()) {
+            window.Telegram.WebApp.close();
+        } else {
+            console.log('Demo mode: Close not available');
+        }
     }
 };
 
@@ -253,15 +256,3 @@ function isDeadlineUrgent(deadline) {
     const diffDays = (deadlineDate - now) / (1000 * 60 * 60 * 24);
     return diffDays <= 1;
 }
-
-// Инициализация при загрузке данных от бота
-window.addEventListener('message', (event) => {
-    // Получение данных от бота через postMessage
-    if (event.data && event.data.type === 'bot_data') {
-        const { key, value } = event.data;
-        API.saveToStorage(key, value);
-
-        // Перезагрузить интерфейс
-        location.reload();
-    }
-});

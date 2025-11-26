@@ -34,7 +34,7 @@ async function loadChildren(parentId) {
         children.forEach(child => {
             const option = document.createElement('option');
             option.value = child.student_id;
-            option.textContent = `${child.full_name} (${child.class_name})`;
+            option.textContent = `${child.full_name} (${child.class_name || 'Не указан'})`;
             select.appendChild(option);
         });
 
