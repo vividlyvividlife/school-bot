@@ -41,6 +41,15 @@ dp = Dispatcher(storage=storage)
 # Main router
 main_router = Router()
 
+# Middleware для логирования
+@dp.update.outer_middleware
+async def logging_middleware(handler, event, data):
+    if event.message and event.message.text:
+        logger.info(f"📩 Message: '{event.message.text}' from {event.message.from_user.id}")
+    elif event.callback_query:
+        logger.info(f"📩 Callback: '{event.callback_query.data}' from {event.callback_query.from_user.id}")
+    return await handler(event, data)
+
 
 @main_router.message(CommandStart())
 async def cmd_start(message: Message):
