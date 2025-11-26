@@ -1,8 +1,8 @@
 // API helper для связи с Backend сервером
 // Работает через REST API
 
-// Конфигурация: URL VDS сервера где запущен бот с API
-const API_BASE_URL = 'http://45.147.178.113:8080';
+// Конфигурация: URL VDS сервера (через Cloudflare Tunnel для HTTPS)
+const API_BASE_URL = 'https://ana-provide-gods-fans.trycloudflare.com';
 
 const API = {
     baseUrl: API_BASE_URL, // используем URL VDS сервера
