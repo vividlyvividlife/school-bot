@@ -239,3 +239,147 @@ async function loadClassStatistics() {
         console.error('Error loading statistics:', error);
     }
 }
+
+// ============ MODAL HANDLERS ============
+
+// Универсальная функция для открытия модального окна
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'flex';
+}
+
+// Универсальная функция для закрытия модального окна
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Инициализация обработчиков модальных окон
+document.addEventListener('DOMContentLoaded', () => {
+    // Обработчики кнопок для открытия модальных окон
+    const addSubjectBtn = document.getElementById('add-subject-btn');
+    const addStudentBtn = document.getElementById('add-student-btn');
+    const addHomeworkBtn = document.getElementById('add-homework-btn');
+
+    if (addSubjectBtn) {
+        addSubjectBtn.addEventListener('click', () => openModal('add-subject-modal'));
+    }
+
+    if (addStudentBtn) {
+        addStudentBtn.addEventListener('click', () => openModal('add-student-modal'));
+    }
+
+    if (addHomeworkBtn) {
+        addHomeworkBtn.addEventListener('click', async () => {
+            await loadSubjectsForHomework();
+            openModal('add-homework-modal');
+        });
+    }
+
+    // Обработчики закрытия модальных окон (крестики и кнопки отмены)
+    document.querySelectorAll('.close-modal').forEach(closeBtn => {
+        closeBtn.addEventListener('click', (e) => {
+            const modalId = e.target.getAttribute('data-modal');
+            if (modalId) {
+                closeModal(modalId);
+            } else {
+                // Закрываем родительский модальный блок
+                const modal = e.target.closest('.modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const modalId = e.target.getAttribute('data-close-modal');
+            closeModal(modalId);
+        });
+    });
+
+    // Обработчик формы добавления предмета
+    const addSubjectForm = document.getElementById('add-subject-form');
+    if (addSubjectForm) {
+        addSubjectForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('subject-name').value;
+            const maxGrade = parseInt(document.getElementById('subject-max-grade').value);
+
+            try {
+                await API.addSubject(name, window.currentTeacherId, maxGrade);
+                API.showAlert(`Предмет "${name}" добавлен!`);
+                closeModal('add-subject-modal');
+                addSubjectForm.reset();
+                // Обновляем список если нужно
+            } catch (error) {
+                console.error('Error adding subject:', error);
+                API.showAlert('Ошибка при добавлении предмета');
+            }
+        });
+    }
+
+    // Обработчик формы добавления ученика
+    const addStudentForm = document.getElementById('add-student-form');
+    if (addStudentForm) {
+        addStudentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('student-full-name').value;
+            const className = document.getElementById('student-class').value;
+
+            try {
+                await API.addStudent(fullName, className);
+                API.showAlert(`Ученик "${fullName}" добавлен!`);
+                closeModal('add-student-modal');
+                addStudentForm.reset();
+                // Перезагружаем список учеников
+                await loadStudents();
+            } catch (error) {
+                console.error('Error adding student:', error);
+                API.showAlert('Ошибка при добавлении ученика');
+            }
+        });
+    }
+
+    // Обработчик формы добавления ДЗ
+    const addHomeworkForm = document.getElementById('add-homework-form');
+    if (addHomeworkForm) {
+        addHomeworkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const subjectId = parseInt(document.getElementById('homework-subject').value);
+            const title = document.getElementById('homework-title').value;
+            const description = document.getElementById('homework-description').value;
+            const deadline = document.getElementById('homework-deadline').value;
+
+            // Формат для БД
+            const formattedDeadline = deadline ? new Date(deadline).toISOString().replace('T', ' ').slice(0, 19) : null;
+
+            try {
+                await API.addHomework(subjectId, title, description, window.currentTeacherId, formattedDeadline);
+                API.showAlert(`ДЗ "${title}" создано!`);
+                closeModal('add-homework-modal');
+                addHomeworkForm.reset();
+            } catch (error) {
+                console.error('Error adding homework:', error);
+                API.showAlert('Ошибка при создании ДЗ');
+            }
+        });
+    }
+});
+
+// Загрузка предметов для выпадающего списка в форме ДЗ
+async function loadSubjectsForHomework() {
+    try {
+        const subjects = await API.getSubjects();
+        const select = document.getElementById('homework-subject');
+        select.innerHTML = '<option value="">Выберите предмет</option>';
+
+        subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.subject_id;
+            option.textContent = subject.name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading subjects for homework:', error);
+    }
+}

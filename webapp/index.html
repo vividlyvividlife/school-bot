@@ -30,6 +30,8 @@
                         <option value="">Выберите ученика</option>
                     </select>
                     <button id="add-student-btn" class="btn btn-primary">+ Добавить ученика</button>
+                    <button id="add-subject-btn" class="btn btn-success">📚 Добавить предмет</button>
+                    <button id="add-homework-btn" class="btn btn-info">📝 Создать ДЗ</button>
                 </div>
 
                 <div class="table-container">
@@ -137,6 +139,89 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Отмена</button>
                     <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div id="add-subject-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="add-subject-modal">&times;</span>
+            <h2>➕ Добавить предмет</h2>
+            <form id="add-subject-form">
+                <div class="form-group">
+                    <label for="subject-name">Название предмета:</label>
+                    <input type="text" id="subject-name" required class="form-control"
+                        placeholder="Например: Математика">
+                </div>
+                <div class="form-group">
+                    <label for="subject-max-grade">Максимальный балл:</label>
+                    <input type="number" id="subject-max-grade" min="1" max="100" value="10" required
+                        class="form-control">
+                    <small>5-балльная, 10-балльная, 12-балльная система и т.д.</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close-modal="add-subject-modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="add-student-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="add-student-modal">&times;</span>
+            <h2>➕ Добавить ученика</h2>
+            <form id="add-student-form">
+                <div class="form-group">
+                    <label for="student-full-name">ФИО ученика:</label>
+                    <input type="text" id="student-full-name" required class="form-control"
+                        placeholder="Иванов Иван Иванович">
+                </div>
+                <div class="form-group">
+                    <label for="student-class">Класс:</label>
+                    <input type="text" id="student-class" required class="form-control" placeholder="9А">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close-modal="add-student-modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Homework Modal -->
+    <div id="add-homework-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="add-homework-modal">&times;</span>
+            <h2>➕ Создать домашнее задание</h2>
+            <form id="add-homework-form">
+                <div class="form-group">
+                    <label for="homework-subject">Предмет:</label>
+                    <select id="homework-subject" required class="form-control">
+                        <option value="">Выберите предмет</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="homework-title">Название:</label>
+                    <input type="text" id="homework-title" required class="form-control"
+                        placeholder="Решить задачи 1-10">
+                </div>
+                <div class="form-group">
+                    <label for="homework-description">Описание:</label>
+                    <textarea id="homework-description" class="form-control" rows="3"
+                        placeholder="Подробное описание задания"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="homework-deadline">Срок сдачи:</label>
+                    <input type="datetime-local" id="homework-deadline" class="form-control">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary"
+                        data-close-modal="add-homework-modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
                 </div>
             </form>
         </div>

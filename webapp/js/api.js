@@ -202,6 +202,33 @@ const API = {
         return await this.apiRequest('GET', `/api/parent/${parentId}/students`);
     },
 
+    // ============ CREATE OPERATIONS ============
+
+    async addSubject(name, teacherId, maxGrade = 10) {
+        return await this.apiRequest('POST', '/api/subjects', {
+            name,
+            teacher_id: teacherId,
+            max_grade: maxGrade
+        });
+    },
+
+    async addStudent(fullName, className) {
+        return await this.apiRequest('POST', '/api/students', {
+            full_name: fullName,
+            class_name: className
+        });
+    },
+
+    async addHomework(subjectId, title, description, teacherId, deadline) {
+        return await this.apiRequest('POST', '/api/homework', {
+            subject_id: subjectId,
+            title,
+            description,
+            teacher_id: teacherId,
+            deadline
+        });
+    },
+
     // ============ TELEGRAM HELPERS ============
 
     // Показать уведомление
