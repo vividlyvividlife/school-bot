@@ -112,34 +112,56 @@ async function loadStudentGrades(studentId) {
     }
 }
 
-async function handleGradeEdit(event) {
+// Modal logic
+const modal = document.getElementById('edit-grade-modal');
+const closeBtn = document.querySelector('.close-modal');
+const cancelBtn = document.getElementById('cancel-edit-btn');
+const form = document.getElementById('edit-grade-form');
+
+if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
+if (cancelBtn) cancelBtn.onclick = () => modal.style.display = 'none';
+window.onclick = (event) => {
+    if (event.target == modal) modal.style.display = 'none';
+}
+
+if (form) {
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const gradeId = document.getElementById('edit-grade-id').value;
+        const grade = parseInt(document.getElementById('edit-grade-value').value);
+        const comment = document.getElementById('edit-grade-comment').value;
+
+        if (isNaN(grade) || grade < 1 || grade > 10) {
+            API.showAlert('Оценка должна быть от 1 до 10');
+            return;
+        }
+
+        try {
+            const success = await API.updateGrade(gradeId, grade, comment);
+            if (success) {
+                modal.style.display = 'none';
+                API.showAlert('Оценка обновлена!');
+                // Reload grades
+                const studentId = document.getElementById('student-select').value;
+                await loadStudentGrades(studentId);
+            }
+        } catch (error) {
+            console.error('Error updating grade:', error);
+            API.showAlert('Ошибка обновления оценки');
+        }
+    };
+}
+
+function handleGradeEdit(event) {
     const gradeId = event.target.dataset.gradeId;
     const currentGrade = event.target.dataset.currentGrade;
+    const currentComment = event.target.title ? event.target.title.split(' (')[0] : '';
 
-    const newGrade = prompt(`Текущая оценка: ${currentGrade}\nВведите новую оценку (1-10):`, currentGrade);
+    document.getElementById('edit-grade-id').value = gradeId;
+    document.getElementById('edit-grade-value').value = currentGrade;
+    document.getElementById('edit-grade-comment').value = currentComment;
 
-    if (!newGrade || newGrade === currentGrade) return;
-
-    const grade = parseInt(newGrade);
-    if (isNaN(grade) || grade < 1 || grade > 10) {
-        API.showAlert('Оценка должна быть от 1 до 10');
-        return;
-    }
-
-    const comment = prompt('Комментарий (необязательно):');
-
-    try {
-        const success = await API.updateGrade(gradeId, grade, comment);
-        if (success) {
-            API.showAlert('Оценка обновлена!');
-            // Reload grades
-            const studentId = document.getElementById('student-select').value;
-            await loadStudentGrades(studentId);
-        }
-    } catch (error) {
-        console.error('Error updating grade:', error);
-        API.showAlert('Ошибка обновления оценки');
-    }
+    modal.style.display = 'block';
 }
 
 async function addNewGrade(studentId, subjectId) {
