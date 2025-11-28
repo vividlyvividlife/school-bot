@@ -70,7 +70,7 @@ async def api_get_subjects(request):
     """Получение списка предметов"""
     logger.info(f"API: GET /api/subjects")
     try:
-        subjects = await asyncio.to_thread(db.get_subjects)
+        subjects = await asyncio.to_thread(db.get_all_subjects)
         return web.json_response({'success': True, 'data': subjects})
     except Exception as e:
         logger.error(f"Error getting subjects: {e}")
@@ -183,7 +183,7 @@ async def api_get_parent_students(request):
     parent_id = int(request.match_info['parent_id'])
     logger.info(f"API: GET /api/parent/{parent_id}/students")
     try:
-        students = await asyncio.to_thread(db.get_students_by_parent, parent_id)
+        students = await asyncio.to_thread(db.get_parent_students, parent_id)
         return web.json_response({'success': True, 'data': students})
     except Exception as e:
         logger.error(f"Error getting parent students: {e}")
