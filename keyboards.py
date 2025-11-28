@@ -15,8 +15,8 @@ def get_teacher_menu() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="✏️ Выставить оценки"), KeyboardButton(text="📝 Создать ДЗ")],
             [KeyboardButton(text="✅ Одобрить родителей"), KeyboardButton(text="📊 Статистика")],
             [KeyboardButton(
-                text="🌐 Открыть таблицу",
-                web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=teacher")
+                text="Открыть школу",
+                web_app=WebAppInfo(url=WEBAPP_URL)
             )]
         ],
         resize_keyboard=True
