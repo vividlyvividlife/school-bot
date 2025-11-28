@@ -1,6 +1,7 @@
 """
 Простой веб-сервер для Mini App с REST API
 Запускается вместе с ботом и отдает статические файлы + API endpoints
+Updated: 2025-11-28 - Added user role API endpoint
 """
 
 from aiohttp import web
