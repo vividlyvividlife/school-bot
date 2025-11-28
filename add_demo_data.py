@@ -8,23 +8,27 @@ from config import ROLE_TEACHER, ROLE_PARENT, ROLE_STUDENT
 from datetime import datetime, timedelta
 import random
 
-def add_demo_data():
+def add_demo_data(teacher_id=None):
     print("🚀 Добавление тестовых данных...")
     
-    # 1. Добавляем учителя (если уже есть пользователи, пропускаем)
-    if db.is_first_user():
-        teacher_id = 111111
-        db.add_user(
-            user_id=teacher_id,
-            username="teacher_demo",
-            full_name="Иван Иванович Учителев",
-            role=ROLE_TEACHER
-        )
-        print(f"✅ Добавлен учитель ID: {teacher_id}")
+    # 1. Определяем ID учителя
+    if teacher_id is None:
+        # Если не передан, используем первого пользователя или создаем дефолтного
+        if db.is_first_user():
+            teacher_id = 111111
+            db.add_user(
+                user_id=teacher_id,
+                username="teacher_demo",
+                full_name="Иван Иванович Учителев",
+                role=ROLE_TEACHER
+            )
+            print(f"✅ Добавлен учитель ID: {teacher_id}")
+        else:
+            # Попробуем найти существующего учителя
+            teacher_id = 111111
+            print(f"ℹ️ Используем учителя ID: {teacher_id}")
     else:
-        # Получаем первого учителя
-        teacher_id = 111111
-        print(f"ℹ️ Используем существующего учителя ID: {teacher_id}")
+        print(f"ℹ️ Используем учителя ID: {teacher_id} (из параметра)")
     
     # 2. Добавляем родителей
     parent_ids = [222222, 333333]
@@ -164,4 +168,7 @@ def add_demo_data():
 
 
 if __name__ == "__main__":
-    add_demo_data()
+    import sys
+    # Можно передать teacher_id как аргумент: python add_demo_data.py 479339411
+    teacher_id = int(sys.argv[1]) if len(sys.argv) > 1 else None
+    add_demo_data(teacher_id)
