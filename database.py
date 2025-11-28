@@ -71,6 +71,7 @@ class Database:
                 subject_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 teacher_id INTEGER NOT NULL,
+                max_grade INTEGER DEFAULT 10,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (teacher_id) REFERENCES users(user_id)
             )
@@ -296,19 +297,19 @@ class Database:
 
     # ============ SUBJECT METHODS ============
     
-    def add_subject(self, name: str, teacher_id: int) -> Optional[int]:
+    def add_subject(self, name: str, teacher_id: int, max_grade: int = 10) -> Optional[int]:
         """Добавление предмета"""
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
             cursor.execute(
-                'INSERT INTO subjects (name, teacher_id) VALUES (?, ?)',
-                (name, teacher_id)
+                'INSERT INTO subjects (name, teacher_id, max_grade) VALUES (?, ?, ?)',
+                (name, teacher_id, max_grade)
             )
             subject_id = cursor.lastrowid
             conn.commit()
             conn.close()
-            logger.info(f"Subject {name} added with ID {subject_id}")
+            logger.info(f"Subject {name} added with ID {subject_id}, max_grade={max_grade}")
             return subject_id
         except Exception as e:
             logger.error(f"Error adding subject: {e}")

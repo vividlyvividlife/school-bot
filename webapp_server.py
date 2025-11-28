@@ -205,6 +205,81 @@ async def api_get_user(request):
         return web.json_response({'success': False, 'error': str(e)}, status=500)
 
 
+async def api_add_subject(request):
+    """Создание предмета"""
+    logger.info(f"API: POST /api/subjects")
+    try:
+        data = await request.json()
+        name = data.get('name')
+        teacher_id = data.get('teacher_id')
+        max_grade = data.get('max_grade', 10)
+        
+        if not name or not teacher_id:
+            return web.json_response({'success': False, 'error': 'Name and teacher_id are required'}, status=400)
+        
+        subject_id = await asyncio.to_thread(db.add_subject, name, int(teacher_id), int(max_grade))
+        if subject_id:
+            return web.json_response({'success': True, 'data': {'subject_id': subject_id}})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to add subject'}, status=500)
+    except Exception as e:
+        logger.error(f"Error adding subject: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_add_student(request):
+    """Создание ученика"""
+    logger.info(f"API: POST /api/students")
+    try:
+        data = await request.json()
+        full_name = data.get('full_name')
+        class_name = data.get('class_name')
+        user_id = data.get('user_id')  # Optional
+        
+        if not full_name or not class_name:
+            return web.json_response({'success': False, 'error': 'full_name and class_name are required'}, status=400)
+        
+        student_id = await asyncio.to_thread(db.add_student, full_name, class_name, user_id)
+        if student_id:
+            return web.json_response({'success': True, 'data': {'student_id': student_id}})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to add student'}, status=500)
+    except Exception as e:
+        logger.error(f"Error adding student: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_add_homework(request):
+    """Создание домашнего задания"""
+    logger.info(f"API: POST /api/homework")
+    try:
+        data = await request.json()
+        subject_id = data.get('subject_id')
+        title = data.get('title')
+        description = data.get('description', '')
+        deadline = data.get('deadline')
+        teacher_id = data.get('teacher_id')
+        
+        if not subject_id or not title or not teacher_id:
+            return web.json_response({'success': False, 'error': 'subject_id, title, and teacher_id are required'}, status=400)
+        
+        homework_id = await asyncio.to_thread(
+            db.add_homework,
+            int(subject_id),
+            title,
+            description,
+            int(teacher_id),
+            deadline
+        )
+        if homework_id:
+            return web.json_response({'success': True, 'data': {'homework_id': homework_id}})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to add homework'}, status=500)
+    except Exception as e:
+        logger.error(f"Error adding homework: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
 # ============ SERVER SETUP ============
 
 def create_webapp_server(host='0.0.0.0', port=8080):
@@ -243,6 +318,9 @@ def create_webapp_server(host='0.0.0.0', port=8080):
         app.router.add_get('/api/statistics', api_get_statistics),
         app.router.add_get('/api/parent/{parent_id}/students', api_get_parent_students),
         app.router.add_get('/api/user/{user_id}', api_get_user),
+        app.router.add_post('/api/subjects', api_add_subject),
+        app.router.add_post('/api/students', api_add_student),
+        app.router.add_post('/api/homework', api_add_homework),
     ]
     
     # Применяем CORS к API роутам
