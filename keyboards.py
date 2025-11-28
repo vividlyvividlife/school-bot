@@ -2,7 +2,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 # URL вашего GitHub Pages (обновите после деплоя)
 # Формат: https://username.github.io/repository-name/
-WEBAPP_URL = "https://reggae-lucy-cycling-meditation.trycloudflare.com"
+# Добавляем версию для сброса кеша
+WEBAPP_URL = "https://reggae-lucy-cycling-meditation.trycloudflare.com?v=3"
 
 
 # ============ MAIN MENUS ============
