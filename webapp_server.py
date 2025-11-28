@@ -210,8 +210,6 @@ def create_webapp_server(host='0.0.0.0', port=8080):
     static_routes = [
         app.router.add_get('/', serve_index),
         app.router.add_get('/index.html', serve_index),
-        app.router.add_get('/css/{filename}', serve_static),
-        app.router.add_get('/js/{filename}', serve_static),
     ]
     
     # Static files (не добавляем CORS к статическим файлам)
