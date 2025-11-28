@@ -18,8 +18,8 @@ const API = {
         return !this.isTelegramWebApp() && typeof DEMO_DATA !== 'undefined';
     },
 
-    // Получение данных пользователя из Telegram
-    getUserData(userId) {
+    // Получение данных пользователя
+    async getUserData(userId) {
         // Если демо-режим, возвращаем тестовые данные
         if (this.isDemoMode()) {
             return {
@@ -30,12 +30,20 @@ const API = {
             };
         }
 
-        // Данные передаются через initData от Telegram
+        // Пытаемся получить актуальные данные (включая роль) с сервера
+        try {
+            const user = await this.apiRequest('GET', `/api/user/${userId}`);
+            if (user) {
+                console.log('User data loaded from API:', user);
+                return user;
+            }
+        } catch (e) {
+            console.warn('Failed to fetch user from API, falling back to Telegram data', e);
+        }
+
+        // Fallback: Данные из Telegram (роль может быть неточной)
         const tg = window.Telegram.WebApp;
         const user = tg.initDataUnsafe.user;
-
-        // В реальном приложении роль будет получена от бота
-        // Для демо используем start_param из deep link
         const startParam = tg.initDataUnsafe.start_param;
 
         return {

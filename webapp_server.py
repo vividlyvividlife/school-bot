@@ -190,6 +190,20 @@ async def api_get_parent_students(request):
         return web.json_response({'success': False, 'error': str(e)}, status=500)
 
 
+async def api_get_user(request):
+    """Получение информации о пользователе"""
+    user_id = int(request.match_info['user_id'])
+    logger.info(f"API: GET /api/user/{user_id}")
+    try:
+        user = await asyncio.to_thread(db.get_user, user_id)
+        if not user:
+            return web.json_response({'success': False, 'error': 'User not found'}, status=404)
+        return web.json_response({'success': True, 'data': user})
+    except Exception as e:
+        logger.error(f"Error getting user: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
 # ============ SERVER SETUP ============
 
 def create_webapp_server(host='0.0.0.0', port=8080):
@@ -227,6 +241,7 @@ def create_webapp_server(host='0.0.0.0', port=8080):
         app.router.add_get('/api/homework', api_get_homework),
         app.router.add_get('/api/statistics', api_get_statistics),
         app.router.add_get('/api/parent/{parent_id}/students', api_get_parent_students),
+        app.router.add_get('/api/user/{user_id}', api_get_user),
     ]
     
     # Применяем CORS к API роутам

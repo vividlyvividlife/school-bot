@@ -2,7 +2,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 # URL вашего GitHub Pages (обновите после деплоя)
 # Формат: https://username.github.io/repository-name/
-WEBAPP_URL = "https://vividlyvividlife.github.io/school-bot/"
+WEBAPP_URL = "https://reggae-lucy-cycling-meditation.trycloudflare.com"
 
 
 # ============ MAIN MENUS ============
@@ -15,7 +15,7 @@ def get_teacher_menu() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="✏️ Выставить оценки"), KeyboardButton(text="📝 Создать ДЗ")],
             [KeyboardButton(text="✅ Одобрить родителей"), KeyboardButton(text="📊 Статистика")],
             [KeyboardButton(
-                text="Открыть школу",
+                text="📖 Открыть журнал",
                 web_app=WebAppInfo(url=WEBAPP_URL)
             )]
         ],
@@ -31,8 +31,8 @@ def get_parent_menu() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="👶 Мои дети")],
             [KeyboardButton(text="📊 Оценки"), KeyboardButton(text="📝 Домашние задания")],
             [KeyboardButton(
-                text="🌐 Открыть таблицу",
-                web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=parent")
+                text="📓 Открыть дневник",
+                web_app=WebAppInfo(url=WEBAPP_URL)
             )]
         ],
         resize_keyboard=True
@@ -46,8 +46,8 @@ def get_student_menu() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="📊 Мои оценки"), KeyboardButton(text="📝 Домашние задания")],
             [KeyboardButton(
-                text="🌐 Открыть таблицу",
-                web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=student")
+                text="📓 Открыть дневник",
+                web_app=WebAppInfo(url=WEBAPP_URL)
             )]
         ],
         resize_keyboard=True
