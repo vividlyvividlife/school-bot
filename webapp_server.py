@@ -43,6 +43,25 @@ async def serve_static(request):
 
 # ============ API HANDLERS ============
 
+async def api_get_user(request):
+    """Получение информации о пользователе по telegram_id"""
+    user_id = int(request.match_info['user_id'])
+    logger.info(f"API: GET /api/user/{user_id}")
+    try:
+        # user_id здесь это telegram_id из фронтенда
+        user = await asyncio.to_thread(db.get_user, user_id)
+        if not user:
+            return web.json_response({'success': False, 'error': 'User not found'}, status=404)
+        
+        # Проверяем является ли админом
+        is_admin = await asyncio.to_thread(db.is_admin, user_id)
+        user['is_admin'] = is_admin
+        
+        return web.json_response({'success': True, 'data': user})
+    except Exception as e:
+        logger.error(f"Error getting user: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
 async def api_get_students(request):
     """Получение списка учеников"""
     logger.info(f"API: GET /api/students")
