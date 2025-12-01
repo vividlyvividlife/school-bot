@@ -23,6 +23,7 @@ MAX_GRADE = 10
 DEADLINE_REMINDER_DAYS = 1  # Напоминание за 1 день до дедлайна
 
 # Roles
+ROLE_ADMIN = 'admin'
 ROLE_TEACHER = 'teacher'
 ROLE_PARENT = 'parent'
 ROLE_STUDENT = 'student'

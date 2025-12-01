@@ -5,8 +5,23 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 # Добавляем версию для сброса кеша
 WEBAPP_URL = "https://reggae-lucy-cycling-meditation.trycloudflare.com?v=3"
 
-
 # ============ MAIN MENUS ============
+
+def get_admin_menu() -> ReplyKeyboardMarkup:
+    """Главное меню администратора"""
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🏫 Классы"), KeyboardButton(text="📚 Предметы")],
+            [KeyboardButton(text="👨‍🏫 Назначить учителя"), KeyboardButton(text="🔑 Создать приглашение")],
+            [KeyboardButton(
+                text="⚙️ Админ панель",
+                web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=admin")
+            )]
+        ],
+        resize_keyboard=True
+    )
+    return keyboard
+
 
 def get_teacher_menu() -> ReplyKeyboardMarkup:
     """Главное меню учителя"""
@@ -133,4 +148,25 @@ def get_homework_keyboard(homework_id: int, has_file: bool = False) -> InlineKey
     if has_file:
         buttons.append([InlineKeyboardButton(text="📎 Скачать файл", callback_data=f"hw_file_{homework_id}")])
     buttons.append([InlineKeyboardButton(text="◀️ Назад", callback_data="back_hw")])
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_role_selection_keyboard() -> InlineKeyboardMarkup:
+    """Клавиатура выбора роли для создания приглашения"""
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="👨‍🏫 Учитель", callback_data="invite_role_teacher")],
+        [InlineKeyboardButton(text="🎓 Ученик", callback_data="invite_role_student")],
+        [InlineKeyboardButton(text="👨‍👩‍👧 Родитель", callback_data="invite_role_parent")]
+    ])
+    return keyboard
+
+
+def get_classes_keyboard(classes: list) -> InlineKeyboardMarkup:
+    """Клавиатура со списком классов"""
+    buttons = []
+    for cls in classes:
+        buttons.append([InlineKeyboardButton(
+            text=cls['name'],
+            callback_data=f"class_{cls['class_id']}"
+        )])
     return InlineKeyboardMarkup(inline_keyboard=buttons)

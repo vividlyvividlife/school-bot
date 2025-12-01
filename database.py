@@ -110,6 +110,55 @@ class Database:
             )
         ''')
 
+        # === НОВЫЕ ТАБЛИЦЫ ДЛЯ ПОЛНОЦЕННОЙ ШКОЛЫ ===
+        
+        # Таблица классов (9А, 10Б и т.д.)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS classes (
+                class_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Таблица назначений учителей (кто какой предмет в каком классе ведет)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS teaching_assignments (
+                assignment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                teacher_id INTEGER NOT NULL,
+                class_id INTEGER NOT NULL,
+                subject_id INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(teacher_id, class_id, subject_id),
+                FOREIGN KEY (teacher_id) REFERENCES users(user_id),
+                FOREIGN KEY (class_id) REFERENCES classes(class_id),
+                FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
+            )
+        ''')
+        
+        # Таблица пригласительных кодов
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS invite_codes (
+                code_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code TEXT NOT NULL UNIQUE,
+                role TEXT NOT NULL,
+                full_name TEXT NOT NULL,
+                is_used BOOLEAN DEFAULT 0,
+                used_by INTEGER,
+                created_by INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                used_at TIMESTAMP,
+                FOREIGN KEY (used_by) REFERENCES users(user_id),
+                FOREIGN KEY (created_by) REFERENCES users(user_id)
+            )
+        ''')
+        
+        # Добавляем колонку is_admin в таблицу users (если еще нет)
+        try:
+            cursor.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0')
+        except:
+            pass  # Колонка уже существует
+
         conn.commit()
         conn.close()
         logger.info("Database initialized successfully")
@@ -464,6 +513,152 @@ class Database:
         row = cursor.fetchone()
         conn.close()
         return dict(row) if row else None
+
+    # ============ ADMIN METHODS ============
+    
+    def is_first_user(self) -> bool:
+        """Проверка, является ли БД пустой (для создания первого админа)"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) as count FROM users')
+        count = cursor.fetchone()['count']
+        conn.close()
+        return count == 0
+    
+    def make_admin(self, user_id: int) -> bool:
+        """Назначить пользователя админом"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('UPDATE users SET is_admin = 1 WHERE user_id = ?', (user_id,))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error making user admin: {e}")
+            return False
+    
+    def is_admin(self, user_id: int) -> bool:
+        """Проверка, является ли пользователь админом"""
+        user = self.get_user(user_id)
+        return user and user.get('is_admin', 0) == 1
+    
+    # --- Управление классами ---
+    
+    def create_class(self, name: str) -> Optional[int]:
+        """Создать класс"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO classes (name) VALUES (?)', (name,))
+            class_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            return class_id
+        except sqlite3.IntegrityError:
+            logger.warning(f"Class {name} already exists")
+            return None
+    
+    def get_all_classes(self) -> List[Dict[str, Any]]:
+        """Получить все классы"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM classes ORDER BY name')
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    # --- Управление назначениями ---
+    
+    def assign_teacher(self, teacher_id: int, class_id: int, subject_id: int) -> Optional[int]:
+        """Назначить учителя на предмет в классе"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO teaching_assignments (teacher_id, class_id, subject_id)
+                VALUES (?, ?, ?)
+            ''', (teacher_id, class_id, subject_id))
+            assignment_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            return assignment_id
+        except sqlite3.IntegrityError:
+            logger.warning(f"Assignment already exists")
+            return None
+    
+    def get_teacher_assignments(self, teacher_id: int) -> List[Dict[str, Any]]:
+        """Получить все назначения учителя"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT ta.*, c.name as class_name, s.name as subject_name
+            FROM teaching_assignments ta
+            JOIN classes c ON ta.class_id = c.class_id
+            JOIN subjects s ON ta.subject_id = s.subject_id
+            WHERE ta.teacher_id = ?
+            ORDER BY c.name, s.name
+        ''', (teacher_id,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    # --- Управление приглашениями ---
+    
+    def generate_invite_code(self) -> str:
+        """Генерация уникального кода приглашения"""
+        import secrets
+        import string
+        chars = string.ascii_uppercase + string.digits
+        return ''.join(secrets.choice(chars) for _ in range(8))
+    
+    def create_invite(self, role: str, full_name: str, created_by: int) -> str:
+        """Создать пригласительный код"""
+        code = self.generate_invite_code()
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO invite_codes (code, role, full_name, created_by)
+                VALUES (?, ?, ?, ?)
+            ''', (code, role, full_name, created_by))
+            conn.commit()
+            conn.close()
+            return code
+        except Exception as e:
+            logger.error(f"Error creating invite: {e}")
+            return None
+    
+    def use_invite_code(self, code: str, user_id: int) -> Optional[Dict[str, Any]]:
+        """Использовать пригласительный код"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Проверяем код
+        cursor.execute('''
+            SELECT * FROM invite_codes 
+            WHERE code = ? AND is_used = 0
+        ''', (code,))
+        invite = cursor.fetchone()
+        
+        if not invite:
+            conn.close()
+            return None
+        
+        # Помечаем код как использованный
+        cursor.execute('''
+            UPDATE invite_codes 
+            SET is_used = 1, used_by = ?, used_at = CURRENT_TIMESTAMP
+            WHERE code = ?
+        ''', (user_id, code))
+        
+        conn.commit()
+        conn.close()
+        
+        return {
+            'role': invite['role'],
+            'full_name': invite['full_name']
+        }
 
 
 # Singleton instance
