@@ -25,6 +25,7 @@ def get_admin_menu() -> ReplyKeyboardMarkup:
 
 def get_teacher_menu() -> ReplyKeyboardMarkup:
     """Главное меню учителя"""
+    
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="👥 Ученики"), KeyboardButton(text="📚 Предметы")],
