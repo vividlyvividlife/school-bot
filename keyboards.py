@@ -15,7 +15,7 @@ def get_admin_menu() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="👨‍🏫 Назначить учителя"), KeyboardButton(text="🔑 Создать приглашение")],
             [KeyboardButton(
                 text="⚙️ Админ панель",
-                web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=admin")
+                web_app=WebAppInfo(url=f"{WEBAPP_URL}&role=admin")
             )]
         ],
         resize_keyboard=True

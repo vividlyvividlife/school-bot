@@ -61,6 +61,7 @@ const API = {
 
         if (param.includes('teacher')) return 'teacher';
         if (param.includes('student')) return 'student';
+        if (param.includes('admin')) return 'admin';
         return 'parent';
     },
 

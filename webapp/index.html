@@ -283,6 +283,8 @@
                     await initParentInterface(userId);
                 } else if (role === 'student') {
                     await initStudentInterface(userId);
+                } else if (role === 'admin') {
+                    await initTeacherInterface(userId);
                 }
 
                 // Hide loading, show content
@@ -298,7 +300,8 @@
             const roles = {
                 'teacher': 'Учитель',
                 'parent': 'Родитель',
-                'student': 'Ученик'
+                'student': 'Ученик',
+                'admin': 'Администратор'
             };
             return roles[role] || 'Неизвестно';
         }

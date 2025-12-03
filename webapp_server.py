@@ -210,18 +210,7 @@ async def api_get_parent_students(request):
         return web.json_response({'success': False, 'error': str(e)}, status=500)
 
 
-async def api_get_user(request):
-    """Получение информации о пользователе"""
-    user_id = int(request.match_info['user_id'])
-    logger.info(f"API: GET /api/user/{user_id}")
-    try:
-        user = await asyncio.to_thread(db.get_user, user_id)
-        if not user:
-            return web.json_response({'success': False, 'error': 'User not found'}, status=404)
-        return web.json_response({'success': True, 'data': user})
-    except Exception as e:
-        logger.error(f"Error getting user: {e}")
-        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
 
 
 async def api_add_subject(request):
