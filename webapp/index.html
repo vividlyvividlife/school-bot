@@ -238,51 +238,86 @@
         let userId = null;
         let userName = 'User';
 
-        // Проверяем доступностьTelegram WebApp
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+        console.log('=== School Bot Mini App Starting ===');
+        console.log('URL:', window.location.href);
+        console.log('User Agent:', navigator.userAgent);
+
+        // Check Telegram WebApp availability
+        if (window.Telegram && window.Telegram.WebApp) {
             tg = window.Telegram.WebApp;
             tg.expand();
             tg.ready();
 
+            console.log('✅ Telegram WebApp detected');
+            console.log('Platform:', tg.platform);
+            console.log('Version:', tg.version);
+            console.log('InitData present:', !!tg.initData);
+            console.log('InitData length:', tg.initData ? tg.initData.length : 0);
+
             // Get user data from Telegram
             const initData = tg.initDataUnsafe;
-            userId = initData.user?.id;
-            userName = initData.user?.first_name || 'User';
+            console.log('InitDataUnsafe:', JSON.stringify(initData));
+
+            if (initData && initData.user) {
+                userId = initData.user.id;
+                userName = initData.user.first_name || 'User';
+                console.log('✅ User extracted - ID:', userId, 'Name:', userName);
+            } else {
+                console.error('⚠️ No user in initDataUnsafe!');
+                console.log('Full initData object:', initData);
+            }
         } else {
-            // Демо-режим: используем тестовые данные
-            console.log('🔧 Работаем в демо-режиме (вне Telegram)');
-            userId = 12345; // Демо user_id
+            console.log('ℹ️ Telegram WebApp not available (demo mode)');
+            userId = 12345; // Demo user_id
             userName = 'Демо Пользователь';
         }
 
         // Get role from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const roleParam = urlParams.get('role');
+        console.log('Role from URL:', roleParam);
 
         // Initialize app
         async function initApp() {
             try {
+                console.log('🚀 Starting initApp with userId:', userId);
+
+                if (!userId) {
+                    console.error('❌ No userId available!');
+                    showError(`Не удалось получить ID пользователя. Platform: ${tg?.platform || 'unknown'}, Has Telegram: ${!!tg}`);
+                    return;
+                }
+
                 // Get user data from API
+                console.log('Fetching user data from API for userId:', userId);
                 const userData = await API.getUserData(userId);
+                console.log('User data from API:', userData);
 
                 if (!userData) {
-                    showError(`Пользователь не найден. ID: ${userId}, TG: ${!!tg}, InitData: ${!!(tg && tg.initData)}`);
+                    const errorMsg = `Пользователь не найден в БД. ID: ${userId}, Platform: ${tg?.platform || 'unknown'}`;
+                    console.error('❌', errorMsg);
+                    showError(errorMsg);
                     return;
                 }
 
                 // Use role from URL parameter or from user data
                 let role = roleParam || userData.role;
+                console.log('Initial role:', role, '(from URL param:', roleParam, ', from userData:', userData.role, ')');
 
                 // Force admin role if user is admin
                 if (userData.is_admin) {
+                    console.log('✅ User is admin, forcing admin role');
                     role = 'admin';
                 }
+
+                console.log('Final role:', role);
 
                 // Use full_name from API if available
                 const displayName = userData.full_name || userName;
                 document.getElementById('user-info').textContent = `${displayName} (${getRoleName(role)})`;
 
                 // Show appropriate interface
+                console.log('Loading interface for role:', role);
                 if (role === 'teacher') {
                     await initTeacherInterface(userId);
                 } else if (role === 'parent') {
@@ -292,17 +327,19 @@
                 } else if (role === 'admin') {
                     await initTeacherInterface(userId);
                 } else {
-                    console.error('Unknown role:', role);
+                    console.error('❌ Unknown role:', role);
                     showError(`Неизвестная роль: ${role}`);
                     return;
                 }
 
+                console.log('✅ App initialized successfully');
                 // Hide loading, show content
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
             } catch (error) {
-                console.error('Init error:', error);
-                showError('Ошибка загрузки данных');
+                console.error('❌ Init error:', error);
+                console.error('Error stack:', error.stack);
+                showError('Ошибка загрузки данных: ' + error.message);
             }
         }
 
@@ -317,15 +354,18 @@
         }
 
         function showError(message) {
+            console.error('Showing error to user:', message);
             document.getElementById('loading').innerHTML = `
                 <div class="error">
                     <p>❌ ${message}</p>
+                    <p style="font-size: 12px; color: #666;">Откройте консоль разработчика для подробностей</p>
                     <button onclick="location.reload()" class="btn btn-primary">Обновить</button>
                 </div>
             `;
         }
 
         // Start app
+        console.log('Calling initApp()...');
         initApp();
     </script>
 </body>
