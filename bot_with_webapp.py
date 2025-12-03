@@ -195,7 +195,8 @@ def get_role_name(role: str) -> str:
     roles = {
         ROLE_TEACHER: 'Учитель',
         ROLE_PARENT: 'Родитель',
-        ROLE_STUDENT: 'Ученик'
+        ROLE_STUDENT: 'Ученик',
+        ROLE_ADMIN: 'Администратор'
     }
     return roles.get(role, 'Неизвестно')
 

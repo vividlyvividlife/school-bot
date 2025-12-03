@@ -271,7 +271,13 @@
                 }
 
                 // Use role from URL parameter or from user data
-                const role = roleParam || userData.role;
+                let role = roleParam || userData.role;
+
+                // Force admin role if user is admin
+                if (userData.is_admin) {
+                    role = 'admin';
+                }
+
                 // Use full_name from API if available
                 const displayName = userData.full_name || userName;
                 document.getElementById('user-info').textContent = `${displayName} (${getRoleName(role)})`;
@@ -285,6 +291,10 @@
                     await initStudentInterface(userId);
                 } else if (role === 'admin') {
                     await initTeacherInterface(userId);
+                } else {
+                    console.error('Unknown role:', role);
+                    showError(`Неизвестная роль: ${role}`);
+                    return;
                 }
 
                 // Hide loading, show content
