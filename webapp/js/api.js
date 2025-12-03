@@ -15,7 +15,8 @@ const API = {
 
     // Проверка демо-режима
     isDemoMode() {
-        return !this.isTelegramWebApp() && typeof DEMO_DATA !== 'undefined';
+        // Force disable demo mode to always use real DB
+        return false;
     },
 
     // Получение данных пользователя
@@ -42,16 +43,22 @@ const API = {
         }
 
         // Fallback: Данные из Telegram (роль может быть неточной)
-        const tg = window.Telegram.WebApp;
-        const user = tg.initDataUnsafe.user;
-        const startParam = tg.initDataUnsafe.start_param;
+        if (this.isTelegramWebApp()) {
+            const tg = window.Telegram.WebApp;
+            const user = tg.initDataUnsafe.user;
+            const startParam = tg.initDataUnsafe.start_param;
 
-        return {
-            user_id: user.id,
-            username: user.username,
-            full_name: `${user.first_name} ${user.last_name || ''}`.trim(),
-            role: this.getRoleFromParam(startParam)
-        };
+            if (user) {
+                return {
+                    user_id: user.id,
+                    username: user.username,
+                    full_name: `${user.first_name} ${user.last_name || ''}`.trim(),
+                    role: this.getRoleFromParam(startParam)
+                };
+            }
+        }
+
+        return null;
     },
 
     getRoleFromParam(param) {
