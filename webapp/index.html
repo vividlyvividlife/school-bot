@@ -7,6 +7,33 @@
     <title>School Bot - Mini App</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        #debug-log {
+            background: #1a1a2e;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #debug-log .error {
+            color: #f55;
+        }
+
+        #debug-log .warn {
+            color: #ff0;
+        }
+
+        #debug-log .info {
+            color: #0ff;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,6 +41,7 @@
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <p>Загрузка...</p>
+            <div id="debug-log"></div>
         </div>
 
         <div id="content" style="display: none;">
@@ -45,7 +73,6 @@
                             </tr>
                         </thead>
                         <tbody id="grades-tbody">
-                            <!-- Grades will be inserted here -->
                         </tbody>
                     </table>
                 </div>
@@ -79,7 +106,6 @@
                             </tr>
                         </thead>
                         <tbody id="parent-grades-tbody">
-                            <!-- Grades will be inserted here -->
                         </tbody>
                     </table>
                 </div>
@@ -107,7 +133,6 @@
                             </tr>
                         </thead>
                         <tbody id="student-grades-tbody">
-                            <!-- Grades will be inserted here -->
                         </tbody>
                     </table>
                 </div>
@@ -233,14 +258,25 @@
     <script src="js/parent.js"></script>
     <script src="js/student.js"></script>
     <script>
+        // Debug logger - shows logs on page
+        const debugLog = document.getElementById('debug-log');
+        function log(msg, type = '') {
+            const time = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${time}] ${msg}`;
+            debugLog.appendChild(line);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(msg);
+        }
+
         // Initialize Telegram WebApp
         let tg = null;
         let userId = null;
         let userName = 'User';
 
-        console.log('=== School Bot Mini App Starting ===');
-        console.log('URL:', window.location.href);
-        console.log('User Agent:', navigator.userAgent);
+        log('=== School Bot Mini App ===', 'info');
+        log('URL: ' + window.location.href);
 
         // Check Telegram WebApp availability
         if (window.Telegram && window.Telegram.WebApp) {
@@ -248,98 +284,102 @@
             tg.expand();
             tg.ready();
 
-            console.log('✅ Telegram WebApp detected');
-            console.log('Platform:', tg.platform);
-            console.log('Version:', tg.version);
-            console.log('InitData present:', !!tg.initData);
-            console.log('InitData length:', tg.initData ? tg.initData.length : 0);
+            log('✓ Telegram WebApp detected', 'info');
+            log('Platform: ' + tg.platform);
+            log('Version: ' + tg.version);
+            log('InitData length: ' + (tg.initData ? tg.initData.length : 0));
+            log('InitData: ' + (tg.initData || '(empty)'));
 
             // Get user data from Telegram
             const initData = tg.initDataUnsafe;
-            console.log('InitDataUnsafe:', JSON.stringify(initData));
+            log('InitDataUnsafe: ' + JSON.stringify(initData));
 
             if (initData && initData.user) {
                 userId = initData.user.id;
                 userName = initData.user.first_name || 'User';
-                console.log('✅ User extracted - ID:', userId, 'Name:', userName);
+                log('✓ User from initDataUnsafe: ' + userId, 'info');
             } else {
-                console.error('⚠️ No user in initDataUnsafe!');
-                console.log('Full initData object:', initData);
+                log('⚠ No user in initDataUnsafe', 'warn');
+
+                // Try to parse user from raw initData string
+                if (tg.initData) {
+                    try {
+                        const params = new URLSearchParams(tg.initData);
+                        const userStr = params.get('user');
+                        log('User param: ' + (userStr || '(none)'));
+                        if (userStr) {
+                            const userObj = JSON.parse(decodeURIComponent(userStr));
+                            userId = userObj.id;
+                            userName = userObj.first_name || 'User';
+                            log('✓ User parsed: ' + userId, 'info');
+                        }
+                    } catch (e) {
+                        log('✗ Parse error: ' + e.message, 'error');
+                    }
+                } else {
+                    log('✗ InitData is empty!', 'error');
+                }
             }
         } else {
-            console.log('ℹ️ Telegram WebApp not available (demo mode)');
-            userId = 12345; // Demo user_id
+            log('ℹ Demo mode (no Telegram)', 'warn');
+            userId = 12345;
             userName = 'Демо Пользователь';
         }
 
         // Get role from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const roleParam = urlParams.get('role');
-        console.log('Role from URL:', roleParam);
+        log('Role param: ' + (roleParam || '(none)'));
 
         // Initialize app
         async function initApp() {
             try {
-                console.log('🚀 Starting initApp with userId:', userId);
+                log('Starting initApp, userId=' + userId);
 
                 if (!userId) {
-                    console.error('❌ No userId available!');
-                    showError(`Не удалось получить ID пользователя. Platform: ${tg?.platform || 'unknown'}, Has Telegram: ${!!tg}`);
+                    log('✗ No userId!', 'error');
+                    showError(`Не удалось получить ID. Platform: ${tg?.platform}, InitData: ${tg?.initData ? 'есть' : 'пусто'}`);
                     return;
                 }
 
-                // Get user data from API
-                console.log('Fetching user data from API for userId:', userId);
+                log('Fetching API data...');
                 const userData = await API.getUserData(userId);
-                console.log('User data from API:', userData);
+                log('API response: ' + JSON.stringify(userData));
 
                 if (!userData) {
-                    const errorMsg = `Пользователь не найден в БД. ID: ${userId}, Platform: ${tg?.platform || 'unknown'}`;
-                    console.error('❌', errorMsg);
-                    showError(errorMsg);
+                    log('✗ User not in DB', 'error');
+                    showError(`Пользователь не найден. ID: ${userId}`);
                     return;
                 }
 
-                // Use role from URL parameter or from user data
                 let role = roleParam || userData.role;
-                console.log('Initial role:', role, '(from URL param:', roleParam, ', from userData:', userData.role, ')');
-
-                // Force admin role if user is admin
                 if (userData.is_admin) {
-                    console.log('✅ User is admin, forcing admin role');
                     role = 'admin';
                 }
+                log('Role: ' + role, 'info');
 
-                console.log('Final role:', role);
-
-                // Use full_name from API if available
                 const displayName = userData.full_name || userName;
                 document.getElementById('user-info').textContent = `${displayName} (${getRoleName(role)})`;
 
-                // Show appropriate interface
-                console.log('Loading interface for role:', role);
-                if (role === 'teacher') {
+                log('Loading interface...');
+                if (role === 'teacher' || role === 'admin') {
                     await initTeacherInterface(userId);
                 } else if (role === 'parent') {
                     await initParentInterface(userId);
                 } else if (role === 'student') {
                     await initStudentInterface(userId);
-                } else if (role === 'admin') {
-                    await initTeacherInterface(userId);
                 } else {
-                    console.error('❌ Unknown role:', role);
+                    log('✗ Unknown role: ' + role, 'error');
                     showError(`Неизвестная роль: ${role}`);
                     return;
                 }
 
-                console.log('✅ App initialized successfully');
-                // Hide loading, show content
+                log('✓ Success!', 'info');
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
             } catch (error) {
-                console.error('❌ Init error:', error);
-                console.error('Error stack:', error.stack);
-                showError('Ошибка загрузки данных: ' + error.message);
+                log('✗ Error: ' + error.message, 'error');
+                showError('Ошибка: ' + error.message);
             }
         }
 
@@ -354,18 +394,20 @@
         }
 
         function showError(message) {
-            console.error('Showing error to user:', message);
-            document.getElementById('loading').innerHTML = `
+            log('Show error: ' + message, 'error');
+            const loading = document.getElementById('loading');
+            // Keep debug log visible
+            loading.innerHTML = `
                 <div class="error">
                     <p>❌ ${message}</p>
-                    <p style="font-size: 12px; color: #666;">Откройте консоль разработчика для подробностей</p>
                     <button onclick="location.reload()" class="btn btn-primary">Обновить</button>
                 </div>
+                <div id="debug-log" style="background:#1a1a2e;color:#0f0;font-family:monospace;font-size:11px;padding:10px;margin:10px;border-radius:8px;max-height:300px;overflow-y:auto;white-space:pre-wrap;">${debugLog.innerHTML}</div>
             `;
         }
 
         // Start app
-        console.log('Calling initApp()...');
+        log('Calling initApp()...');
         initApp();
     </script>
 </body>
