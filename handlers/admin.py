@@ -3,12 +3,12 @@
 """
 
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 from database import db
-from keyboards import get_admin_menu, get_role_selection_keyboard
+from keyboards import get_admin_menu, get_role_selection_keyboard, WEBAPP_URL
 from config import ROLE_TEACHER, ROLE_STUDENT, ROLE_PARENT
 
 router = Router()
@@ -26,6 +26,27 @@ def get_role_name(role: str) -> str:
         ROLE_STUDENT: 'Ученик'
     }
     return roles.get(role, 'Неизвестно')
+
+
+# ============ АДМИН ПАНЕЛЬ ============
+
+@router.message(F.text == "⚙️ Админ панель")
+async def admin_open_panel(message: Message):
+    """Открытие админ панели через inline кнопку (передает initData на всех платформах)"""
+    if not db.is_admin(message.from_user.id):
+        return
+    
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text="🚀 Открыть Админ панель",
+            web_app=WebAppInfo(url=f"{WEBAPP_URL}&role=admin")
+        )]
+    ])
+    
+    await message.answer(
+        "Нажмите кнопку ниже чтобы открыть админ панель:",
+        reply_markup=keyboard
+    )
 
 
 # ============ СОЗДАНИЕ ПРИГЛАШЕНИЙ ============
