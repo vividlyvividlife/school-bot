@@ -774,11 +774,16 @@
             </div>
             <div id="invite-result" style="display:none;">
                 <div class="invite-code-display">
-                    <p>Приглашение создано!</p>
+                    <p id="invite-result-info" style="margin-bottom:8px;color:var(--tg-theme-text-color)"></p>
                     <div class="invite-code" id="generated-code"></div>
-                    <button class="copy-btn" onclick="copyInviteCode()">📋 Копировать код</button>
+                    <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+                        <button class="copy-btn" onclick="copyInviteCode()">📋 Копировать</button>
+                        <button class="copy-btn" onclick="shareInvite()" style="background:var(--primary-color)">📤
+                            Поделиться</button>
+                    </div>
                 </div>
                 <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="hideModal('createInvite')">Закрыть</button>
                     <button class="btn btn-primary" onclick="resetInviteForm()">Создать ещё</button>
                 </div>
             </div>
@@ -1100,6 +1105,11 @@
                     created_by: userId,
                     target_data: targetData
                 });
+                const roleNames = { teacher: 'Учителя', parent: 'Родителя', student: 'Ученика', admin: 'Админа' };
+                document.getElementById('invite-result-info').textContent = 'Для ' + (roleNames[role] || role) + ': ' + fullName;
+                const roleNames = { teacher: 'Учителя', parent: 'Родителя', student: 'Ученика', admin: 'Админа' };
+                document.getElementById('invite-result-info').textContent = 
+                    'Для ' + (roleNames[role] || role) + ': ' + fullName;
                 document.getElementById('generated-code').textContent = result.code;
                 document.getElementById('invite-form').style.display = 'none';
                 document.getElementById('invite-result').style.display = 'block';
@@ -1122,8 +1132,20 @@
         function copyInviteCode() {
             const code = document.getElementById('generated-code').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                alert('Код скопирован: ' + code);
+                alert('Скопирован код: ' + code);
             });
+        }
+
+        function shareInvite() {
+            const code = document.getElementById('generated-code').textContent;
+            const info = document.getElementById('invite-result-info').textContent;
+            const text = '🎫 Приглашение в School Bot\n' + info + '\nКод: ' + code;
+            if (navigator.share) { navigator.share({ title: 'Приглашение', text: text }); }
+            else { navigator.clipboard.writeText(text).then(() => alert('Текст скопирован!')); }
+        }
+
+        function copyCode(code, name, role) {
+            navigator.clipboard.writeText('🎫 Для ' + role + ': ' + name + '\nКод: ' + code).then(() => alert('Скопировано!'));
         }
 
         // ========== ASSIGN TEACHER ==========
@@ -1319,7 +1341,7 @@
                         <div class="list-item">
                             <div class="list-item-info">
                                 <div class="list-item-title">${roleIcons[i.role] || '🎫'} ${i.full_name}</div>
-                                <div class="list-item-subtitle">Код: <b>${i.code}</b> • ${i.role}</div>
+                                <div class="list-item-subtitle"><b>${i.code}</b> • ${i.role}</div>
                             </div>
                         </div>
                     `).join('');
