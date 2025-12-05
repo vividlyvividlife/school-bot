@@ -25,7 +25,8 @@ WEBAPP_DIR = Path(__file__).parent / 'webapp'
 async def serve_index(request):
     """Отдача index.html"""
     index_path = WEBAPP_DIR / 'index.html'
-    return web.FileResponse(index_path)
+    # Явно указываем кодировку UTF-8 в заголовках
+    return web.FileResponse(index_path, headers={'Content-Type': 'text/html; charset=utf-8'})
 
 
 async def serve_static(request):
