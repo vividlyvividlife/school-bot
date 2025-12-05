@@ -50,7 +50,6 @@ async def serve_js(request):
     if not full_path.is_file():
         return web.Response(status=404, text='File not found')
     
-    # Читаем файл как текст в UTF-8
     try:
         with open(full_path, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -61,6 +60,27 @@ async def serve_js(request):
         )
     except Exception as e:
         logger.error(f"Error reading JS file {filename}: {e}")
+        return web.Response(status=500, text=str(e))
+
+
+async def serve_css(request):
+    """Отдача CSS файлов с явной кодировкой UTF-8"""
+    filename = request.match_info['filename']
+    full_path = WEBAPP_DIR / 'css' / filename
+    
+    if not full_path.is_file():
+        return web.Response(status=404, text='File not found')
+    
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return web.Response(
+            text=content,
+            content_type='text/css',
+            charset='utf-8'
+        )
+    except Exception as e:
+        logger.error(f"Error reading CSS file {filename}: {e}")
         return web.Response(status=500, text=str(e))
 
 
@@ -333,8 +353,8 @@ def create_webapp_server(host='0.0.0.0', port=8080):
         app.router.add_get('/index.html', serve_index),
     ]
     
-    # Static files (не добавляем CORS к статическим файлам)
-    app.router.add_static('/css/', WEBAPP_DIR / 'css', name='css')
+    # Static files with explicit UTF-8 encoding
+    app.router.add_get('/css/{filename}', serve_css)
     # JS files served with explicit UTF-8 encoding
     app.router.add_get('/js/{filename}', serve_js)
     
