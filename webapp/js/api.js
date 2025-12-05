@@ -1,6 +1,8 @@
 // API helper для связи с Backend сервером
 // Работает через REST API
 
+console.log('Executing api.js...');
+
 // Конфигурация: URL VDS сервера
 // Используем текущий origin, так как фронтенд и бэкенд будут на одном адресе (через Cloudflare)
 const API_BASE_URL = window.location.origin;
