@@ -32,7 +32,6 @@ body {
     margin: 0 auto;
 }
 
-/* Loading */
 .loading {
     display: flex;
     flex-direction: column;
@@ -51,12 +50,9 @@ body {
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
-/* Header */
 .header {
     margin-bottom: 24px;
     padding-bottom: 16px;
@@ -74,7 +70,6 @@ body {
     font-size: 14px;
 }
 
-/* Controls */
 .controls {
     display: flex;
     gap: 12px;
@@ -95,16 +90,11 @@ body {
     transition: border-color 0.3s;
 }
 
-.select:hover {
+.select:hover, .select:focus {
     border-color: var(--primary-color);
-}
-
-.select:focus {
     outline: none;
-    border-color: var(--primary-color);
 }
 
-/* Buttons */
 .btn {
     padding: 12px 20px;
     border: none;
@@ -142,7 +132,6 @@ body {
     font-size: 12px;
 }
 
-/* Table */
 .table-container {
     overflow-x: auto;
     margin-bottom: 24px;
@@ -182,7 +171,6 @@ body {
     border-bottom: none;
 }
 
-/* Grade badges */
 .grade-badge {
     display: inline-block;
     padding: 4px 8px;
@@ -193,29 +181,22 @@ body {
     color: white;
 }
 
-.grade-10,
-.grade-9 {
+.grade-10, .grade-9 {
     background: linear-gradient(135deg, #4caf50, #45a049);
 }
 
-.grade-8,
-.grade-7 {
+.grade-8, .grade-7 {
     background: linear-gradient(135deg, #2196f3, #1976d2);
 }
 
-.grade-6,
-.grade-5 {
+.grade-6, .grade-5 {
     background: linear-gradient(135deg, #ff9800, #f57c00);
 }
 
-.grade-4,
-.grade-3,
-.grade-2,
-.grade-1 {
+.grade-4, .grade-3, .grade-2, .grade-1 {
     background: linear-gradient(135deg, #f44336, #d32f2f);
 }
 
-/* Editable grade */
 .grade-editable {
     cursor: pointer;
     transition: all 0.3s;
@@ -226,7 +207,6 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Statistics */
 .statistics {
     background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
     padding: 20px;
@@ -273,7 +253,6 @@ body {
     gap: 12px;
 }
 
-/* Homework */
 .homework-section {
     margin-top: 24px;
 }
@@ -321,18 +300,10 @@ body {
 }
 
 @keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
-/* Error */
 .error {
     padding: 20px;
     background-color: #ffebee;
@@ -341,36 +312,15 @@ body {
     text-align: center;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-    body {
-        padding: 12px;
-    }
-
-    .header h1 {
-        font-size: 20px;
-    }
-
-    .controls {
-        flex-direction: column;
-    }
-
-    .select {
-        min-width: 100%;
-    }
-
-    .grades-table th,
-    .grades-table td {
-        padding: 8px;
-        font-size: 12px;
-    }
-
-    .stat-grid {
-        grid-template-columns: 1fr;
-    }
+    body { padding: 12px; }
+    .header h1 { font-size: 20px; }
+    .controls { flex-direction: column; }
+    .select { min-width: 100%; }
+    .grades-table th, .grades-table td { padding: 8px; font-size: 12px; }
+    .stat-grid { grid-template-columns: 1fr; }
 }
 
-/* Empty state */
 .empty-state {
     text-align: center;
     padding: 40px 20px;
@@ -386,7 +336,6 @@ body {
     font-size: 16px;
 }
 
-/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -452,23 +401,11 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
