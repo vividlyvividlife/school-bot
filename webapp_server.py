@@ -42,6 +42,28 @@ async def serve_static(request):
     return web.FileResponse(full_path)
 
 
+async def serve_js(request):
+    """Отдача JS файлов с явной кодировкой UTF-8"""
+    filename = request.match_info['filename']
+    full_path = WEBAPP_DIR / 'js' / filename
+    
+    if not full_path.is_file():
+        return web.Response(status=404, text='File not found')
+    
+    # Читаем файл как текст в UTF-8
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return web.Response(
+            text=content,
+            content_type='application/javascript',
+            charset='utf-8'
+        )
+    except Exception as e:
+        logger.error(f"Error reading JS file {filename}: {e}")
+        return web.Response(status=500, text=str(e))
+
+
 # ============ API HANDLERS ============
 
 async def api_get_user(request):
@@ -313,7 +335,8 @@ def create_webapp_server(host='0.0.0.0', port=8080):
     
     # Static files (не добавляем CORS к статическим файлам)
     app.router.add_static('/css/', WEBAPP_DIR / 'css', name='css')
-    app.router.add_static('/js/', WEBAPP_DIR / 'js', name='js')
+    # JS files served with explicit UTF-8 encoding
+    app.router.add_get('/js/{filename}', serve_js)
     
     # API routes (с CORS)
     api_routes = [
