@@ -4,10 +4,8 @@ async function initParentInterface(userId) {
     const parentInterface = document.getElementById('parent-interface');
     parentInterface.style.display = 'block';
 
-    // Load children
     await loadChildren(userId);
 
-    // Event listeners
     document.getElementById('child-select').addEventListener('change', handleChildChange);
 }
 
@@ -19,15 +17,7 @@ async function loadChildren(parentId) {
         select.innerHTML = '<option value="">Выберите ребенка</option>';
 
         if (children.length === 0) {
-            document.getElementById('parent-stats').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">👶</div>
-                    <div class="empty-state-text">
-                        У вас нет привязанных детей.<br>
-                        Используйте команду /link_child в боте.
-                    </div>
-                </div>
-            `;
+            document.getElementById('parent-stats').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👶</div><div class="empty-state-text">У вас нет привязанных детей.<br>Используйте команду /link_child в боте.</div></div>';
             return;
         }
 
@@ -38,7 +28,6 @@ async function loadChildren(parentId) {
             select.appendChild(option);
         });
 
-        // Auto-select if only one child
         if (children.length === 1) {
             select.value = children[0].student_id;
             await handleChildChange({ target: select });
@@ -84,20 +73,9 @@ async function loadChildStatistics(studentId) {
 
         if (stats.subject_averages && Object.keys(stats.subject_averages).length > 0) {
             const subjectStats = Object.entries(stats.subject_averages)
-                .map(([subject, data]) => `
-                    <div class="stat-card">
-                        <h3>${subject}</h3>
-                        <div class="stat-value">${data.average}</div>
-                        <div class="stat-label">${data.count} оценок</div>
-                    </div>
-                `).join('');
+                .map(([subject, data]) => `<div class="stat-card"><h3>${subject}</h3><div class="stat-value">${data.average}</div><div class="stat-label">${data.count} оценок</div></div>`).join('');
 
-            statsDiv.innerHTML += `
-                <h3 style="margin-top: 20px; margin-bottom: 12px;">По предметам:</h3>
-                <div class="stat-grid">
-                    ${subjectStats}
-                </div>
-            `;
+            statsDiv.innerHTML += `<h3 style="margin-top: 20px; margin-bottom: 12px;">По предметам:</h3><div class="stat-grid">${subjectStats}</div>`;
         }
     } catch (error) {
         console.error('Error loading statistics:', error);
@@ -113,14 +91,7 @@ async function loadChildGrades(studentId) {
         tbody.innerHTML = '';
 
         if (subjects.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="empty-state">
-                        <div class="empty-state-icon">📚</div>
-                        <div class="empty-state-text">Нет данных об оценках</div>
-                    </td>
-                </tr>
-            `;
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">Нет данных об оценках</div></td></tr>';
             return;
         }
 
@@ -133,12 +104,7 @@ async function loadChildGrades(studentId) {
                 <td><strong>${subject.name}</strong></td>
                 <td>
                     <div class="grades-list">
-                        ${subjectGrades.map(g => `
-                            <span class="grade-badge grade-${g.grade}" 
-                                  title="${g.comment || ''} (${formatDate(g.date)})">
-                                ${g.grade}
-                            </span>
-                        `).join('') || '<span style="color: #999;">Нет оценок</span>'}
+                        ${subjectGrades.map(g => `<span class="grade-badge grade-${g.grade}" title="${g.comment || ''} (${formatDate(g.date)})">${g.grade}</span>`).join('') || '<span style="color: #999;">Нет оценок</span>'}
                     </div>
                 </td>
                 <td><strong>${average || '-'}</strong></td>
@@ -157,12 +123,7 @@ async function loadHomework() {
         const homeworkDiv = document.getElementById('parent-homework');
 
         if (homework.length === 0) {
-            homeworkDiv.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-text">Нет домашних заданий</div>
-                </div>
-            `;
+            homeworkDiv.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Нет домашних заданий</div></div>';
             return;
         }
 
@@ -171,11 +132,7 @@ async function loadHomework() {
                 <h3>📚 ${hw.subject_name}</h3>
                 <p><strong>${hw.title}</strong></p>
                 <p>${hw.description}</p>
-                ${hw.deadline ? `
-                    <span class="homework-deadline ${isDeadlineUrgent(hw.deadline) ? 'urgent' : ''}">
-                        📅 ${formatDateTime(hw.deadline)}
-                    </span>
-                ` : ''}
+                ${hw.deadline ? `<span class="homework-deadline ${isDeadlineUrgent(hw.deadline) ? 'urgent' : ''}">📅 ${formatDateTime(hw.deadline)}</span>` : ''}
                 ${hw.file_id ? '<p>📎 Есть прикрепленный файл</p>' : ''}
             </div>
         `).join('');
