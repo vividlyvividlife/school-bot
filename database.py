@@ -1,5 +1,6 @@
 import sqlite3
 import logging
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -143,6 +144,7 @@ class Database:
                 code TEXT NOT NULL UNIQUE,
                 role TEXT NOT NULL,
                 full_name TEXT NOT NULL,
+                target_data TEXT,
                 is_used BOOLEAN DEFAULT 0,
                 used_by INTEGER,
                 created_by INTEGER NOT NULL,
@@ -152,6 +154,12 @@ class Database:
                 FOREIGN KEY (created_by) REFERENCES users(user_id)
             )
         ''')
+        
+        # Добавляем колонку target_data если её нет
+        try:
+            cursor.execute('ALTER TABLE invite_codes ADD COLUMN target_data TEXT')
+        except:
+            pass  # Колонка уже существует
         
         # Добавляем колонку is_admin в таблицу users (если еще нет)
         try:
@@ -612,25 +620,42 @@ class Database:
         chars = string.ascii_uppercase + string.digits
         return ''.join(secrets.choice(chars) for _ in range(8))
     
-    def create_invite(self, role: str, full_name: str, created_by: int) -> str:
-        """Создать пригласительный код"""
+    def create_invite(self, role: str, full_name: str, created_by: int, 
+                      target_data: Optional[Dict] = None) -> Optional[str]:
+        """Создать пригласительный код
+        
+        Args:
+            role: teacher, parent, student, admin
+            full_name: ФИО пользователя
+            created_by: ID админа создавшего приглашение
+            target_data: дополнительные данные (для parent: student_ids, для student: student_id)
+        """
         code = self.generate_invite_code()
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
+            target_json = json.dumps(target_data) if target_data else None
             cursor.execute('''
-                INSERT INTO invite_codes (code, role, full_name, created_by)
-                VALUES (?, ?, ?, ?)
-            ''', (code, role, full_name, created_by))
+                INSERT INTO invite_codes (code, role, full_name, target_data, created_by)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (code, role, full_name, target_json, created_by))
             conn.commit()
             conn.close()
+            logger.info(f"Created invite code {code} for {role} {full_name}")
             return code
         except Exception as e:
             logger.error(f"Error creating invite: {e}")
             return None
     
-    def use_invite_code(self, code: str, user_id: int) -> Optional[Dict[str, Any]]:
-        """Использовать пригласительный код"""
+    def use_invite_code(self, code: str, user_id: int, username: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """Использовать пригласительный код
+        
+        При активации:
+        - Создаётся пользователь с нужной ролью
+        - Для parent: создаются связи с учениками
+        - Для student: привязывается user_id к записи student
+        - Для admin: устанавливается is_admin=1
+        """
         conn = self.get_connection()
         cursor = conn.cursor()
         
@@ -645,6 +670,44 @@ class Database:
             conn.close()
             return None
         
+        invite_dict = dict(invite)
+        role = invite_dict['role']
+        full_name = invite_dict['full_name']
+        target_data = json.loads(invite_dict['target_data']) if invite_dict.get('target_data') else {}
+        
+        # Создаём пользователя
+        try:
+            cursor.execute(
+                'INSERT INTO users (user_id, username, full_name, role) VALUES (?, ?, ?, ?)',
+                (user_id, username, full_name, role)
+            )
+        except sqlite3.IntegrityError:
+            # Пользователь уже существует - обновляем роль
+            cursor.execute('UPDATE users SET role = ? WHERE user_id = ?', (role, user_id))
+        
+        # Обрабатываем в зависимости от роли
+        if role == 'parent' and target_data.get('student_ids'):
+            # Создаём связи с учениками (сразу approved!)
+            for student_id in target_data['student_ids']:
+                try:
+                    cursor.execute('''
+                        INSERT INTO parent_student_links (parent_id, student_id, status, approved_at)
+                        VALUES (?, ?, 'approved', CURRENT_TIMESTAMP)
+                    ''', (user_id, student_id))
+                except sqlite3.IntegrityError:
+                    pass  # Связь уже существует
+        
+        elif role == 'student' and target_data.get('student_id'):
+            # Привязываем Telegram к записи ученика
+            cursor.execute(
+                'UPDATE students SET user_id = ? WHERE student_id = ?',
+                (user_id, target_data['student_id'])
+            )
+        
+        elif role == 'admin':
+            # Устанавливаем флаг админа
+            cursor.execute('UPDATE users SET is_admin = 1 WHERE user_id = ?', (user_id,))
+        
         # Помечаем код как использованный
         cursor.execute('''
             UPDATE invite_codes 
@@ -656,10 +719,183 @@ class Database:
         conn.close()
         
         return {
-            'role': invite['role'],
-            'full_name': invite['full_name']
+            'role': role,
+            'full_name': full_name,
+            'target_data': target_data
         }
+    
+    def get_all_invites(self, include_used: bool = False) -> List[Dict[str, Any]]:
+        """Получить все приглашения"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        if include_used:
+            cursor.execute('''
+                SELECT ic.*, u.full_name as created_by_name
+                FROM invite_codes ic
+                LEFT JOIN users u ON ic.created_by = u.user_id
+                ORDER BY ic.created_at DESC
+            ''')
+        else:
+            cursor.execute('''
+                SELECT ic.*, u.full_name as created_by_name
+                FROM invite_codes ic
+                LEFT JOIN users u ON ic.created_by = u.user_id
+                WHERE ic.is_used = 0
+                ORDER BY ic.created_at DESC
+            ''')
+        rows = cursor.fetchall()
+        conn.close()
+        result = []
+        for row in rows:
+            d = dict(row)
+            if d.get('target_data'):
+                d['target_data'] = json.loads(d['target_data'])
+            result.append(d)
+        return result
+    
+    # --- Методы для админки ---
+    
+    def get_all_teachers(self) -> List[Dict[str, Any]]:
+        """Получить всех учителей"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT u.*, 
+                   (SELECT COUNT(*) FROM teaching_assignments ta WHERE ta.teacher_id = u.user_id) as assignments_count
+            FROM users u
+            WHERE u.role = 'teacher'
+            ORDER BY u.full_name
+        ''')
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    def get_all_admins(self) -> List[Dict[str, Any]]:
+        """Получить всех админов"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT * FROM users WHERE is_admin = 1 ORDER BY full_name
+        ''')
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    def remove_admin(self, user_id: int) -> bool:
+        """Снять права админа"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('UPDATE users SET is_admin = 0 WHERE user_id = ?', (user_id,))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error removing admin: {e}")
+            return False
+    
+    def get_classes_with_student_count(self) -> List[Dict[str, Any]]:
+        """Получить все классы с количеством учеников"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT c.*, 
+                   (SELECT COUNT(*) FROM students s WHERE s.class_name = c.name) as student_count
+            FROM classes c
+            ORDER BY c.name
+        ''')
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    def get_students_by_class_name(self, class_name: str) -> List[Dict[str, Any]]:
+        """Получить учеников по названию класса"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT s.*, 
+                   CASE WHEN s.user_id IS NOT NULL THEN 1 ELSE 0 END as has_telegram
+            FROM students s
+            WHERE s.class_name = ?
+            ORDER BY s.full_name
+        ''', (class_name,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    def get_all_assignments(self) -> List[Dict[str, Any]]:
+        """Получить все назначения учителей"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT ta.*, 
+                   c.name as class_name, 
+                   s.name as subject_name,
+                   u.full_name as teacher_name
+            FROM teaching_assignments ta
+            JOIN classes c ON ta.class_id = c.class_id
+            JOIN subjects s ON ta.subject_id = s.subject_id
+            JOIN users u ON ta.teacher_id = u.user_id
+            ORDER BY u.full_name, c.name, s.name
+        ''')
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    
+    def delete_assignment(self, assignment_id: int) -> bool:
+        """Удалить назначение учителя"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM teaching_assignments WHERE assignment_id = ?', (assignment_id,))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting assignment: {e}")
+            return False
+    
+    def delete_class(self, class_id: int) -> bool:
+        """Удалить класс"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM classes WHERE class_id = ?', (class_id,))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting class: {e}")
+            return False
+    
+    def delete_student(self, student_id: int) -> bool:
+        """Удалить ученика"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            # Удаляем связи с родителями
+            cursor.execute('DELETE FROM parent_student_links WHERE student_id = ?', (student_id,))
+            # Удаляем оценки
+            cursor.execute('DELETE FROM grades WHERE student_id = ?', (student_id,))
+            # Удаляем ученика
+            cursor.execute('DELETE FROM students WHERE student_id = ?', (student_id,))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting student: {e}")
+            return False
+    
+    def get_all_users(self) -> List[Dict[str, Any]]:
+        """Получить всех пользователей"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users ORDER BY full_name')
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
 
 
 # Singleton instance
 db = Database()
+

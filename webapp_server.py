@@ -331,6 +331,220 @@ async def api_add_homework(request):
         return web.json_response({'success': False, 'error': str(e)}, status=500)
 
 
+# ============ ADMIN API HANDLERS ============
+
+async def api_get_classes(request):
+    """Получение списка классов с количеством учеников"""
+    logger.info("API: GET /api/admin/classes")
+    try:
+        classes = await asyncio.to_thread(db.get_classes_with_student_count)
+        return web.json_response({'success': True, 'data': classes})
+    except Exception as e:
+        logger.error(f"Error getting classes: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_add_class(request):
+    """Создание класса"""
+    logger.info("API: POST /api/admin/classes")
+    try:
+        data = await request.json()
+        name = data.get('name')
+        if not name:
+            return web.json_response({'success': False, 'error': 'Name is required'}, status=400)
+        
+        class_id = await asyncio.to_thread(db.create_class, name)
+        if class_id:
+            return web.json_response({'success': True, 'data': {'class_id': class_id}})
+        else:
+            return web.json_response({'success': False, 'error': 'Class already exists'}, status=400)
+    except Exception as e:
+        logger.error(f"Error adding class: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_delete_class(request):
+    """Удаление класса"""
+    class_id = int(request.match_info['class_id'])
+    logger.info(f"API: DELETE /api/admin/classes/{class_id}")
+    try:
+        success = await asyncio.to_thread(db.delete_class, class_id)
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to delete class'}, status=500)
+    except Exception as e:
+        logger.error(f"Error deleting class: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_get_teachers(request):
+    """Получение списка учителей"""
+    logger.info("API: GET /api/admin/teachers")
+    try:
+        teachers = await asyncio.to_thread(db.get_all_teachers)
+        return web.json_response({'success': True, 'data': teachers})
+    except Exception as e:
+        logger.error(f"Error getting teachers: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_get_assignments(request):
+    """Получение всех назначений учителей"""
+    logger.info("API: GET /api/admin/assignments")
+    try:
+        assignments = await asyncio.to_thread(db.get_all_assignments)
+        return web.json_response({'success': True, 'data': assignments})
+    except Exception as e:
+        logger.error(f"Error getting assignments: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_add_assignment(request):
+    """Назначить учителя на класс+предмет"""
+    logger.info("API: POST /api/admin/assignments")
+    try:
+        data = await request.json()
+        teacher_id = data.get('teacher_id')
+        class_id = data.get('class_id')
+        subject_id = data.get('subject_id')
+        
+        if not all([teacher_id, class_id, subject_id]):
+            return web.json_response({'success': False, 'error': 'All fields required'}, status=400)
+        
+        assignment_id = await asyncio.to_thread(
+            db.assign_teacher, int(teacher_id), int(class_id), int(subject_id)
+        )
+        if assignment_id:
+            return web.json_response({'success': True, 'data': {'assignment_id': assignment_id}})
+        else:
+            return web.json_response({'success': False, 'error': 'Assignment already exists'}, status=400)
+    except Exception as e:
+        logger.error(f"Error adding assignment: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_delete_assignment(request):
+    """Удаление назначения"""
+    assignment_id = int(request.match_info['assignment_id'])
+    logger.info(f"API: DELETE /api/admin/assignments/{assignment_id}")
+    try:
+        success = await asyncio.to_thread(db.delete_assignment, assignment_id)
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to delete'}, status=500)
+    except Exception as e:
+        logger.error(f"Error deleting assignment: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_get_invites(request):
+    """Получение списка приглашений"""
+    include_used = request.query.get('include_used', 'false') == 'true'
+    logger.info(f"API: GET /api/admin/invites include_used={include_used}")
+    try:
+        invites = await asyncio.to_thread(db.get_all_invites, include_used)
+        return web.json_response({'success': True, 'data': invites})
+    except Exception as e:
+        logger.error(f"Error getting invites: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_create_invite(request):
+    """Создание приглашения"""
+    logger.info("API: POST /api/admin/invites")
+    try:
+        data = await request.json()
+        role = data.get('role')
+        full_name = data.get('full_name')
+        created_by = data.get('created_by')
+        target_data = data.get('target_data')  # {student_ids: [...]} для parent
+        
+        if not all([role, full_name, created_by]):
+            return web.json_response({'success': False, 'error': 'role, full_name, created_by required'}, status=400)
+        
+        code = await asyncio.to_thread(db.create_invite, role, full_name, int(created_by), target_data)
+        if code:
+            return web.json_response({'success': True, 'data': {'code': code}})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to create invite'}, status=500)
+    except Exception as e:
+        logger.error(f"Error creating invite: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_get_admins(request):
+    """Получение списка админов"""
+    logger.info("API: GET /api/admin/admins")
+    try:
+        admins = await asyncio.to_thread(db.get_all_admins)
+        return web.json_response({'success': True, 'data': admins})
+    except Exception as e:
+        logger.error(f"Error getting admins: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_make_admin(request):
+    """Назначить пользователя админом"""
+    logger.info("API: POST /api/admin/admins")
+    try:
+        data = await request.json()
+        user_id = data.get('user_id')
+        if not user_id:
+            return web.json_response({'success': False, 'error': 'user_id required'}, status=400)
+        
+        success = await asyncio.to_thread(db.make_admin, int(user_id))
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to make admin'}, status=500)
+    except Exception as e:
+        logger.error(f"Error making admin: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_remove_admin(request):
+    """Снять права админа"""
+    user_id = int(request.match_info['user_id'])
+    logger.info(f"API: DELETE /api/admin/admins/{user_id}")
+    try:
+        success = await asyncio.to_thread(db.remove_admin, user_id)
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to remove admin'}, status=500)
+    except Exception as e:
+        logger.error(f"Error removing admin: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_get_users(request):
+    """Получение всех пользователей"""
+    logger.info("API: GET /api/admin/users")
+    try:
+        users = await asyncio.to_thread(db.get_all_users)
+        return web.json_response({'success': True, 'data': users})
+    except Exception as e:
+        logger.error(f"Error getting users: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
+async def api_delete_student(request):
+    """Удаление ученика"""
+    student_id = int(request.match_info['student_id'])
+    logger.info(f"API: DELETE /api/students/{student_id}")
+    try:
+        success = await asyncio.to_thread(db.delete_student, student_id)
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to delete student'}, status=500)
+    except Exception as e:
+        logger.error(f"Error deleting student: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
+
+
 # ============ SERVER SETUP ============
 
 def create_webapp_server(host='0.0.0.0', port=8080):
@@ -362,6 +576,7 @@ def create_webapp_server(host='0.0.0.0', port=8080):
     api_routes = [
         app.router.add_get('/api/students', api_get_students),
         app.router.add_get('/api/students/{student_id}', api_get_student),
+        app.router.add_delete('/api/students/{student_id}', api_delete_student),
         app.router.add_get('/api/subjects', api_get_subjects),
         app.router.add_get('/api/grades', api_get_grades),
         app.router.add_post('/api/grades', api_add_grade),
@@ -373,6 +588,20 @@ def create_webapp_server(host='0.0.0.0', port=8080):
         app.router.add_post('/api/subjects', api_add_subject),
         app.router.add_post('/api/students', api_add_student),
         app.router.add_post('/api/homework', api_add_homework),
+        # Admin API routes
+        app.router.add_get('/api/admin/classes', api_get_classes),
+        app.router.add_post('/api/admin/classes', api_add_class),
+        app.router.add_delete('/api/admin/classes/{class_id}', api_delete_class),
+        app.router.add_get('/api/admin/teachers', api_get_teachers),
+        app.router.add_get('/api/admin/assignments', api_get_assignments),
+        app.router.add_post('/api/admin/assignments', api_add_assignment),
+        app.router.add_delete('/api/admin/assignments/{assignment_id}', api_delete_assignment),
+        app.router.add_get('/api/admin/invites', api_get_invites),
+        app.router.add_post('/api/admin/invites', api_create_invite),
+        app.router.add_get('/api/admin/admins', api_get_admins),
+        app.router.add_post('/api/admin/admins', api_make_admin),
+        app.router.add_delete('/api/admin/admins/{user_id}', api_remove_admin),
+        app.router.add_get('/api/admin/users', api_get_users),
     ]
     
     # Применяем CORS к API роутам

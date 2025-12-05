@@ -14,6 +14,7 @@
             --primary-color: #2481cc;
             --success-color: #4caf50;
             --danger-color: #f44336;
+            --warning-color: #ff9800;
             --border-radius: 12px;
             --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
@@ -77,6 +78,295 @@
             font-size: 14px;
         }
 
+        /* Role Switcher */
+        .role-switcher {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .role-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--primary-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .role-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Admin Actions */
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .admin-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--primary-color), #1a6ba8);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.3);
+        }
+
+        .admin-btn.success {
+            background: linear-gradient(135deg, var(--success-color), #388e3c);
+        }
+
+        .admin-btn.warning {
+            background: linear-gradient(135deg, var(--warning-color), #f57c00);
+        }
+
+        .admin-btn .icon {
+            font-size: 24px;
+        }
+
+        /* Sections */
+        .section {
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        /* Lists */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-item-info {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 500;
+        }
+
+        .list-item-subtitle {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn.danger {
+            background: #ffebee;
+            color: var(--danger-color);
+        }
+
+        .icon-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-checkbox-group {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .form-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .form-checkbox-item:hover {
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Invite Code Display */
+        .invite-code-display {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .invite-code {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 2px;
+            color: var(--success-color);
+        }
+
+        .copy-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Controls */
         .controls {
             display: flex;
             gap: 12px;
@@ -95,25 +385,7 @@
             font-size: 14px;
         }
 
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-
+        /* Tables */
         .table-container {
             overflow-x: auto;
             margin-bottom: 24px;
@@ -220,6 +492,12 @@
             color: #0ff;
         }
 
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: var(--tg-theme-hint-color);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -232,6 +510,10 @@
             .select {
                 min-width: 100%;
             }
+
+            .admin-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -243,11 +525,83 @@
             <p>Загрузка...</p>
             <div id="debug-log"></div>
         </div>
+
         <div id="content" style="display:none;">
             <header class="header">
                 <h1>School Bot</h1>
                 <p id="user-info"></p>
             </header>
+
+            <!-- Role Switcher (для мультиролей) -->
+            <div id="role-switcher" class="role-switcher" style="display:none;"></div>
+
+            <!-- ========== ADMIN INTERFACE ========== -->
+            <div id="admin-interface" class="interface" style="display:none;">
+                <!-- Action Buttons -->
+                <div class="admin-actions">
+                    <button class="admin-btn" onclick="showModal('addClass')">
+                        <span class="icon">🏫</span>
+                        <span>Добавить класс</span>
+                    </button>
+                    <button class="admin-btn" onclick="showModal('addStudent')">
+                        <span class="icon">👨‍🎓</span>
+                        <span>Добавить ученика</span>
+                    </button>
+                    <button class="admin-btn" onclick="showModal('addSubject')">
+                        <span class="icon">📚</span>
+                        <span>Добавить предмет</span>
+                    </button>
+                    <button class="admin-btn success" onclick="showModal('createInvite')">
+                        <span class="icon">🎫</span>
+                        <span>Приглашение</span>
+                    </button>
+                    <button class="admin-btn warning" onclick="showModal('assignTeacher')">
+                        <span class="icon">📋</span>
+                        <span>Назначить учителя</span>
+                    </button>
+                    <button class="admin-btn" onclick="showModal('manageAdmins')">
+                        <span class="icon">👑</span>
+                        <span>Админы</span>
+                    </button>
+                </div>
+
+                <!-- Classes Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">🏫 Классы <span id="classes-count" class="section-badge">0</span></h3>
+                    </div>
+                    <div id="classes-list"></div>
+                </div>
+
+                <!-- Teachers Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">👨‍🏫 Учителя <span id="teachers-count" class="section-badge">0</span>
+                        </h3>
+                    </div>
+                    <div id="teachers-list"></div>
+                </div>
+
+                <!-- Subjects Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">📚 Предметы <span id="subjects-count" class="section-badge">0</span>
+                        </h3>
+                    </div>
+                    <div id="subjects-list"></div>
+                </div>
+
+                <!-- Invites Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">🎫 Активные приглашения <span id="invites-count"
+                                class="section-badge">0</span></h3>
+                    </div>
+                    <div id="invites-list"></div>
+                </div>
+            </div>
+
+            <!-- ========== TEACHER INTERFACE ========== -->
             <div id="teacher-interface" class="interface" style="display:none;">
                 <div class="controls">
                     <select id="student-select" class="select">
@@ -271,10 +625,14 @@
                     <div id="teacher-stats"></div>
                 </div>
             </div>
+
+            <!-- ========== PARENT INTERFACE ========== -->
             <div id="parent-interface" class="interface" style="display:none;">
-                <div class="controls"><select id="child-select" class="select">
+                <div class="controls">
+                    <select id="child-select" class="select">
                         <option value="">Выберите ребенка</option>
-                    </select></div>
+                    </select>
+                </div>
                 <div class="statistics">
                     <h2>Успеваемость</h2>
                     <div id="parent-stats"></div>
@@ -292,6 +650,8 @@
                     </table>
                 </div>
             </div>
+
+            <!-- ========== STUDENT INTERFACE ========== -->
             <div id="student-interface" class="interface" style="display:none;">
                 <div class="statistics">
                     <h2>Моя успеваемость</h2>
@@ -312,8 +672,161 @@
             </div>
         </div>
     </div>
+
+    <!-- ========== MODALS ========== -->
+
+    <!-- Add Class Modal -->
+    <div id="modal-addClass" class="modal-overlay">
+        <div class="modal">
+            <h3 class="modal-title">🏫 Добавить класс</h3>
+            <div class="form-group">
+                <label class="form-label">Название класса</label>
+                <input type="text" id="class-name" class="form-input" placeholder="Например: 9А">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="hideModal('addClass')">Отмена</button>
+                <button class="btn btn-primary" onclick="addClass()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="modal-addStudent" class="modal-overlay">
+        <div class="modal">
+            <h3 class="modal-title">👨‍🎓 Добавить ученика</h3>
+            <div class="form-group">
+                <label class="form-label">ФИО ученика</label>
+                <input type="text" id="student-name" class="form-input" placeholder="Иванов Иван Иванович">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Класс</label>
+                <select id="student-class" class="form-select"></select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="hideModal('addStudent')">Отмена</button>
+                <button class="btn btn-primary" onclick="addStudent()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div id="modal-addSubject" class="modal-overlay">
+        <div class="modal">
+            <h3 class="modal-title">📚 Добавить предмет</h3>
+            <div class="form-group">
+                <label class="form-label">Название предмета</label>
+                <input type="text" id="subject-name" class="form-input" placeholder="Математика">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Максимальная оценка</label>
+                <select id="subject-max-grade" class="form-select">
+                    <option value="5">5 (пятибалльная)</option>
+                    <option value="10" selected>10 (десятибалльная)</option>
+                    <option value="12">12 (двенадцатибалльная)</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="hideModal('addSubject')">Отмена</button>
+                <button class="btn btn-primary" onclick="addSubject()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Invite Modal -->
+    <div id="modal-createInvite" class="modal-overlay">
+        <div class="modal">
+            <h3 class="modal-title">🎫 Создать приглашение</h3>
+            <div id="invite-form">
+                <div class="form-group">
+                    <label class="form-label">Тип приглашения</label>
+                    <select id="invite-role" class="form-select" onchange="updateInviteForm()">
+                        <option value="">Выберите тип</option>
+                        <option value="teacher">👨‍🏫 Учитель</option>
+                        <option value="parent">👨‍👧 Родитель</option>
+                        <option value="student">📖 Ученик</option>
+                        <option value="admin">👑 Админ</option>
+                    </select>
+                </div>
+                <div id="invite-name-group" class="form-group" style="display:none;">
+                    <label class="form-label">ФИО</label>
+                    <input type="text" id="invite-name" class="form-input" placeholder="Иванов Иван Иванович">
+                </div>
+                <div id="invite-students-group" class="form-group" style="display:none;">
+                    <label class="form-label">Выберите учеников (для родителя)</label>
+                    <div id="invite-students-list" class="form-checkbox-group"></div>
+                </div>
+                <div id="invite-student-group" class="form-group" style="display:none;">
+                    <label class="form-label">Выберите ученика</label>
+                    <select id="invite-student" class="form-select"></select>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="hideModal('createInvite')">Отмена</button>
+                    <button class="btn btn-primary" onclick="createInvite()">Создать</button>
+                </div>
+            </div>
+            <div id="invite-result" style="display:none;">
+                <div class="invite-code-display">
+                    <p>Приглашение создано!</p>
+                    <div class="invite-code" id="generated-code"></div>
+                    <button class="copy-btn" onclick="copyInviteCode()">📋 Копировать код</button>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" onclick="resetInviteForm()">Создать ещё</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Teacher Modal -->
+    <div id="modal-assignTeacher" class="modal-overlay">
+        <div class="modal">
+            <h3 class="modal-title">📋 Назначить учителя</h3>
+            <div class="form-group">
+                <label class="form-label">Учитель</label>
+                <select id="assign-teacher" class="form-select"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Класс</label>
+                <select id="assign-class" class="form-select"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Предмет</label>
+                <select id="assign-subject" class="form-select"></select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="hideModal('assignTeacher')">Отмена</button>
+                <button class="btn btn-primary" onclick="assignTeacher()">Назначить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Admins Modal -->
+    <div id="modal-manageAdmins" class="modal-overlay">
+        <div class="modal">
+            <h3 class="modal-title">👑 Управление админами</h3>
+            <div id="admins-list-modal"></div>
+            <hr style="margin: 16px 0;">
+            <div class="form-group">
+                <label class="form-label">Назначить нового админа</label>
+                <select id="new-admin-user" class="form-select"></select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="hideModal('manageAdmins')">Закрыть</button>
+                <button class="btn btn-primary" onclick="makeAdmin()">Назначить</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ========== GLOBALS ==========
         const debugLog = document.getElementById('debug-log');
+        let userId = null;
+        let userName = 'User';
+        let currentRole = null;
+        let userRoles = [];
+        let isAdmin = false;
+
+        // ========== LOGGING ==========
         function log(msg, type) {
             const line = document.createElement('div');
             line.className = type || '';
@@ -323,8 +836,10 @@
             console.log(msg);
         }
 
+        // ========== API ==========
         const API = {
             baseUrl: window.location.origin,
+
             async request(method, endpoint, data) {
                 const opts = { method, headers: { 'Content-Type': 'application/json' } };
                 if (data) opts.body = JSON.stringify(data);
@@ -333,28 +848,55 @@
                 if (!json.success) throw new Error(json.error || 'API error');
                 return json.data;
             },
+
+            // User
             async getUserData(id) {
                 try { return await this.request('GET', '/api/user/' + id); }
                 catch (e) { log('API error: ' + e.message, 'error'); return null; }
             },
+
+            // Students
             async getStudents() { return await this.request('GET', '/api/students'); },
+            async getStudent(id) { return await this.request('GET', '/api/students/' + id); },
+            async addStudent(data) { return await this.request('POST', '/api/students', data); },
+            async deleteStudent(id) { return await this.request('DELETE', '/api/students/' + id); },
+
+            // Subjects
             async getSubjects() { return await this.request('GET', '/api/subjects'); },
+            async addSubject(data) { return await this.request('POST', '/api/subjects', data); },
+
+            // Grades
             async getGrades(sid) { return await this.request('GET', '/api/grades?student_id=' + sid); },
             async getStatistics(sid) { return await this.request('GET', '/api/statistics?student_id=' + sid); },
+
+            // Parent
             async getParentStudents(pid) { return await this.request('GET', '/api/parent/' + pid + '/students'); },
-            async getStudent(id) { return await this.request('GET', '/api/students/' + id); }
+
+            // Admin - Classes
+            async getClasses() { return await this.request('GET', '/api/admin/classes'); },
+            async addClass(name) { return await this.request('POST', '/api/admin/classes', { name }); },
+            async deleteClass(id) { return await this.request('DELETE', '/api/admin/classes/' + id); },
+
+            // Admin - Teachers
+            async getTeachers() { return await this.request('GET', '/api/admin/teachers'); },
+
+            // Admin - Assignments
+            async getAssignments() { return await this.request('GET', '/api/admin/assignments'); },
+            async addAssignment(data) { return await this.request('POST', '/api/admin/assignments', data); },
+            async deleteAssignment(id) { return await this.request('DELETE', '/api/admin/assignments/' + id); },
+
+            // Admin - Invites
+            async getInvites() { return await this.request('GET', '/api/admin/invites'); },
+            async createInvite(data) { return await this.request('POST', '/api/admin/invites', data); },
+
+            // Admin - Admins
+            async getAdmins() { return await this.request('GET', '/api/admin/admins'); },
+            async getUsers() { return await this.request('GET', '/api/admin/users'); },
+            async makeAdmin(uid) { return await this.request('POST', '/api/admin/admins', { user_id: uid }); },
+            async removeAdmin(uid) { return await this.request('DELETE', '/api/admin/admins/' + uid); }
         };
 
-        function calcAvg(grades) {
-            if (!grades || !grades.length) return '-';
-            return (grades.reduce((a, g) => a + g.grade, 0) / grades.length).toFixed(1);
-        }
-
-        log('=== School Bot Mini App ===', 'info');
-
-        let userId = null;
-        let userName = 'User';
-
+        // ========== TELEGRAM INIT ==========
         function parseUserFromHash() {
             const hash = window.location.hash;
             if (!hash) return null;
@@ -369,6 +911,8 @@
             } catch (e) { log('Hash parse error: ' + e.message, 'error'); }
             return null;
         }
+
+        log('=== School Bot Mini App ===', 'info');
 
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
@@ -404,40 +948,397 @@
             }
         }
 
-        const roleParam = new URLSearchParams(window.location.search).get('role');
+        // ========== HELPERS ==========
+        function calcAvg(grades) {
+            if (!grades || !grades.length) return '-';
+            return (grades.reduce((a, g) => a + g.grade, 0) / grades.length).toFixed(1);
+        }
 
-        async function initApp() {
+        // ========== MODALS ==========
+        function showModal(name) {
+            document.getElementById('modal-' + name).classList.add('active');
+            if (name === 'addStudent') loadClassesForSelect('student-class');
+            if (name === 'createInvite') resetInviteForm();
+            if (name === 'assignTeacher') loadAssignmentSelects();
+            if (name === 'manageAdmins') loadAdminsModal();
+        }
+
+        function hideModal(name) {
+            document.getElementById('modal-' + name).classList.remove('active');
+        }
+
+        // ========== ADMIN ACTIONS ==========
+        async function addClass() {
+            const name = document.getElementById('class-name').value.trim();
+            if (!name) { alert('Введите название класса'); return; }
             try {
-                log('initApp userId=' + userId);
-                const userData = await API.getUserData(userId);
-                log('userData: ' + JSON.stringify(userData));
-                if (!userData) { showError('Пользователь не найден. ID: ' + userId); return; }
-
-                let role = roleParam || userData.role;
-                if (userData.is_admin) role = 'admin';
-                log('Role: ' + role, 'info');
-
-                document.getElementById('user-info').textContent = (userData.full_name || userName) + ' (' + role + ')';
-
-                if (role === 'teacher' || role === 'admin') await initTeacher(userId);
-                else if (role === 'parent') await initParent(userId);
-                else if (role === 'student') await initStudent(userId);
-                else { showError('Unknown role: ' + role); return; }
-
-                log('Success!', 'info');
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
+                await API.addClass(name);
+                hideModal('addClass');
+                document.getElementById('class-name').value = '';
+                loadAdminData();
             } catch (e) {
-                log('Error: ' + e.message, 'error');
-                showError(e.message);
+                alert('Ошибка: ' + e.message);
             }
         }
 
-        function showError(msg) {
-            document.getElementById('loading').innerHTML = '<div class="error"><p>' + msg + '</p><button onclick="location.reload()" class="btn btn-primary">Обновить</button></div><div id="debug-log">' + debugLog.innerHTML + '</div>';
+        async function addStudent() {
+            const name = document.getElementById('student-name').value.trim();
+            const className = document.getElementById('student-class').value;
+            if (!name || !className) { alert('Заполните все поля'); return; }
+            try {
+                await API.addStudent({ full_name: name, class_name: className });
+                hideModal('addStudent');
+                document.getElementById('student-name').value = '';
+                loadAdminData();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
         }
 
-        async function initTeacher(userId) {
+        async function addSubject() {
+            const name = document.getElementById('subject-name').value.trim();
+            const maxGrade = document.getElementById('subject-max-grade').value;
+            if (!name) { alert('Введите название предмета'); return; }
+            try {
+                await API.addSubject({ name, max_grade: parseInt(maxGrade), teacher_id: userId });
+                hideModal('addSubject');
+                document.getElementById('subject-name').value = '';
+                loadAdminData();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        async function loadClassesForSelect(selectId) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = '<option value="">Выберите класс</option>';
+            try {
+                const classes = await API.getClasses();
+                classes.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.name;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                log('Error loading classes: ' + e.message, 'error');
+            }
+        }
+
+        // ========== INVITE ==========
+        async function updateInviteForm() {
+            const role = document.getElementById('invite-role').value;
+            document.getElementById('invite-name-group').style.display =
+                (role === 'teacher' || role === 'parent' || role === 'admin') ? 'block' : 'none';
+            document.getElementById('invite-students-group').style.display =
+                (role === 'parent') ? 'block' : 'none';
+            document.getElementById('invite-student-group').style.display =
+                (role === 'student') ? 'block' : 'none';
+
+            if (role === 'parent' || role === 'student') {
+                const students = await API.getStudents();
+                if (role === 'parent') {
+                    const list = document.getElementById('invite-students-list');
+                    list.innerHTML = '';
+                    students.forEach(s => {
+                        const div = document.createElement('div');
+                        div.className = 'form-checkbox-item';
+                        div.innerHTML = `<input type="checkbox" value="${s.student_id}" id="inv-s-${s.student_id}">
+                            <label for="inv-s-${s.student_id}">${s.full_name} (${s.class_name || '-'})</label>`;
+                        list.appendChild(div);
+                    });
+                } else {
+                    const select = document.getElementById('invite-student');
+                    select.innerHTML = '<option value="">Выберите ученика</option>';
+                    students.filter(s => !s.user_id).forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.student_id;
+                        opt.textContent = `${s.full_name} (${s.class_name || '-'})`;
+                        select.appendChild(opt);
+                    });
+                }
+            }
+        }
+
+        async function createInvite() {
+            const role = document.getElementById('invite-role').value;
+            if (!role) { alert('Выберите тип приглашения'); return; }
+
+            let fullName = '';
+            let targetData = null;
+
+            if (role === 'teacher' || role === 'admin') {
+                fullName = document.getElementById('invite-name').value.trim();
+                if (!fullName) { alert('Введите ФИО'); return; }
+            } else if (role === 'parent') {
+                fullName = document.getElementById('invite-name').value.trim();
+                if (!fullName) { alert('Введите ФИО родителя'); return; }
+                const checkboxes = document.querySelectorAll('#invite-students-list input:checked');
+                if (checkboxes.length === 0) { alert('Выберите хотя бы одного ученика'); return; }
+                targetData = { student_ids: Array.from(checkboxes).map(cb => parseInt(cb.value)) };
+            } else if (role === 'student') {
+                const studentId = document.getElementById('invite-student').value;
+                if (!studentId) { alert('Выберите ученика'); return; }
+                const students = await API.getStudents();
+                const student = students.find(s => s.student_id == studentId);
+                fullName = student ? student.full_name : 'Ученик';
+                targetData = { student_id: parseInt(studentId) };
+            }
+
+            try {
+                const result = await API.createInvite({
+                    role,
+                    full_name: fullName,
+                    created_by: userId,
+                    target_data: targetData
+                });
+                document.getElementById('generated-code').textContent = result.code;
+                document.getElementById('invite-form').style.display = 'none';
+                document.getElementById('invite-result').style.display = 'block';
+                loadAdminData();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        function resetInviteForm() {
+            document.getElementById('invite-form').style.display = 'block';
+            document.getElementById('invite-result').style.display = 'none';
+            document.getElementById('invite-role').value = '';
+            document.getElementById('invite-name').value = '';
+            document.getElementById('invite-name-group').style.display = 'none';
+            document.getElementById('invite-students-group').style.display = 'none';
+            document.getElementById('invite-student-group').style.display = 'none';
+        }
+
+        function copyInviteCode() {
+            const code = document.getElementById('generated-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Код скопирован: ' + code);
+            });
+        }
+
+        // ========== ASSIGN TEACHER ==========
+        async function loadAssignmentSelects() {
+            try {
+                const [teachers, classes, subjects] = await Promise.all([
+                    API.getTeachers(),
+                    API.getClasses(),
+                    API.getSubjects()
+                ]);
+
+                const teacherSelect = document.getElementById('assign-teacher');
+                teacherSelect.innerHTML = '<option value="">Выберите учителя</option>';
+                teachers.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.user_id;
+                    opt.textContent = t.full_name;
+                    teacherSelect.appendChild(opt);
+                });
+
+                const classSelect = document.getElementById('assign-class');
+                classSelect.innerHTML = '<option value="">Выберите класс</option>';
+                classes.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.class_id;
+                    opt.textContent = c.name;
+                    classSelect.appendChild(opt);
+                });
+
+                const subjectSelect = document.getElementById('assign-subject');
+                subjectSelect.innerHTML = '<option value="">Выберите предмет</option>';
+                subjects.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.subject_id;
+                    opt.textContent = s.name;
+                    subjectSelect.appendChild(opt);
+                });
+            } catch (e) {
+                log('Error loading selects: ' + e.message, 'error');
+            }
+        }
+
+        async function assignTeacher() {
+            const teacherId = document.getElementById('assign-teacher').value;
+            const classId = document.getElementById('assign-class').value;
+            const subjectId = document.getElementById('assign-subject').value;
+            if (!teacherId || !classId || !subjectId) { alert('Заполните все поля'); return; }
+            try {
+                await API.addAssignment({
+                    teacher_id: parseInt(teacherId),
+                    class_id: parseInt(classId),
+                    subject_id: parseInt(subjectId)
+                });
+                hideModal('assignTeacher');
+                loadAdminData();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        // ========== MANAGE ADMINS ==========
+        async function loadAdminsModal() {
+            try {
+                const [admins, users] = await Promise.all([
+                    API.getAdmins(),
+                    API.getUsers()
+                ]);
+
+                const listEl = document.getElementById('admins-list-modal');
+                if (admins.length === 0) {
+                    listEl.innerHTML = '<p class="empty-state">Нет админов</p>';
+                } else {
+                    listEl.innerHTML = admins.map(a => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <div class="list-item-title">👑 ${a.full_name}</div>
+                                <div class="list-item-subtitle">${a.role}</div>
+                            </div>
+                            ${a.user_id !== userId ? `<button class="icon-btn danger" onclick="removeAdmin(${a.user_id})">✕</button>` : ''}
+                        </div>
+                    `).join('');
+                }
+
+                const select = document.getElementById('new-admin-user');
+                select.innerHTML = '<option value="">Выберите пользователя</option>';
+                const adminIds = admins.map(a => a.user_id);
+                users.filter(u => !adminIds.includes(u.user_id)).forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.user_id;
+                    opt.textContent = `${u.full_name} (${u.role})`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                log('Error loading admins: ' + e.message, 'error');
+            }
+        }
+
+        async function makeAdmin() {
+            const uid = document.getElementById('new-admin-user').value;
+            if (!uid) { alert('Выберите пользователя'); return; }
+            try {
+                await API.makeAdmin(parseInt(uid));
+                loadAdminsModal();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        async function removeAdmin(uid) {
+            if (!confirm('Снять права админа?')) return;
+            try {
+                await API.removeAdmin(uid);
+                loadAdminsModal();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        // ========== LOAD ADMIN DATA ==========
+        async function loadAdminData() {
+            try {
+                const [classes, teachers, subjects, invites, assignments] = await Promise.all([
+                    API.getClasses(),
+                    API.getTeachers(),
+                    API.getSubjects(),
+                    API.getInvites(),
+                    API.getAssignments()
+                ]);
+
+                // Classes
+                document.getElementById('classes-count').textContent = classes.length;
+                const classesEl = document.getElementById('classes-list');
+                if (classes.length === 0) {
+                    classesEl.innerHTML = '<p class="empty-state">Нет классов</p>';
+                } else {
+                    classesEl.innerHTML = classes.map(c => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <div class="list-item-title">${c.name}</div>
+                                <div class="list-item-subtitle">${c.student_count} учеников</div>
+                            </div>
+                            <button class="icon-btn danger" onclick="deleteClass(${c.class_id})">🗑</button>
+                        </div>
+                    `).join('');
+                }
+
+                // Teachers with assignments
+                document.getElementById('teachers-count').textContent = teachers.length;
+                const teachersEl = document.getElementById('teachers-list');
+                if (teachers.length === 0) {
+                    teachersEl.innerHTML = '<p class="empty-state">Нет учителей</p>';
+                } else {
+                    teachersEl.innerHTML = teachers.map(t => {
+                        const teacherAssignments = assignments.filter(a => a.teacher_id === t.user_id);
+                        const assignmentText = teacherAssignments.length > 0
+                            ? teacherAssignments.map(a => `${a.subject_name} (${a.class_name})`).join(', ')
+                            : 'Нет назначений';
+                        return `
+                            <div class="list-item">
+                                <div class="list-item-info">
+                                    <div class="list-item-title">${t.full_name}</div>
+                                    <div class="list-item-subtitle">${assignmentText}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // Subjects
+                document.getElementById('subjects-count').textContent = subjects.length;
+                const subjectsEl = document.getElementById('subjects-list');
+                if (subjects.length === 0) {
+                    subjectsEl.innerHTML = '<p class="empty-state">Нет предметов</p>';
+                } else {
+                    subjectsEl.innerHTML = subjects.map(s => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <div class="list-item-title">${s.name}</div>
+                                <div class="list-item-subtitle">Максимум: ${s.max_grade}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Invites
+                document.getElementById('invites-count').textContent = invites.length;
+                const invitesEl = document.getElementById('invites-list');
+                if (invites.length === 0) {
+                    invitesEl.innerHTML = '<p class="empty-state">Нет активных приглашений</p>';
+                } else {
+                    const roleIcons = { teacher: '👨‍🏫', parent: '👨‍👧', student: '📖', admin: '👑' };
+                    invitesEl.innerHTML = invites.map(i => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <div class="list-item-title">${roleIcons[i.role] || '🎫'} ${i.full_name}</div>
+                                <div class="list-item-subtitle">Код: <b>${i.code}</b> • ${i.role}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+            } catch (e) {
+                log('Error loading admin data: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteClass(classId) {
+            if (!confirm('Удалить класс?')) return;
+            try {
+                await API.deleteClass(classId);
+                loadAdminData();
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        // ========== ROLE INTERFACES ==========
+        async function initAdmin() {
+            document.getElementById('admin-interface').style.display = 'block';
+            await loadAdminData();
+        }
+
+        async function initTeacher() {
             document.getElementById('teacher-interface').style.display = 'block';
             const students = await API.getStudents();
             const select = document.getElementById('student-select');
@@ -476,7 +1377,7 @@
             document.getElementById('teacher-stats').innerHTML = '<p>Учеников: ' + students.length + ', Средний балл: ' + (cnt ? (total / cnt).toFixed(2) : '-') + '</p>';
         }
 
-        async function initParent(userId) {
+        async function initParent() {
             document.getElementById('parent-interface').style.display = 'block';
             const children = await API.getParentStudents(userId);
             const select = document.getElementById('child-select');
@@ -497,13 +1398,83 @@
             if (children.length === 1) { select.value = children[0].student_id; select.onchange(); }
         }
 
-        async function initStudent(userId) {
+        async function initStudent() {
             document.getElementById('student-interface').style.display = 'block';
             const student = await API.getStudent(userId);
             if (!student) { document.getElementById('student-stats').innerHTML = '<p>Вы не зарегистрированы</p>'; return; }
             await loadGrades(student.student_id, 'student-grades-tbody');
             const st = await API.getStatistics(student.student_id);
             document.getElementById('student-stats').innerHTML = '<p>Средний балл: ' + (st.overall_average || '-') + '</p>';
+        }
+
+        function hideAllInterfaces() {
+            ['admin', 'teacher', 'parent', 'student'].forEach(role => {
+                document.getElementById(role + '-interface').style.display = 'none';
+            });
+        }
+
+        async function switchRole(role) {
+            hideAllInterfaces();
+            currentRole = role;
+
+            // Update switcher buttons
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.role === role);
+            });
+
+            if (role === 'admin') await initAdmin();
+            else if (role === 'teacher') await initTeacher();
+            else if (role === 'parent') await initParent();
+            else if (role === 'student') await initStudent();
+        }
+
+        function showError(msg) {
+            document.getElementById('loading').innerHTML = '<div class="error"><p>' + msg + '</p><button onclick="location.reload()" class="btn btn-primary">Обновить</button></div><div id="debug-log">' + debugLog.innerHTML + '</div>';
+        }
+
+        // ========== INIT APP ==========
+        async function initApp() {
+            try {
+                log('initApp userId=' + userId);
+                const userData = await API.getUserData(userId);
+                log('userData: ' + JSON.stringify(userData));
+                if (!userData) { showError('Пользователь не найден. ID: ' + userId); return; }
+
+                isAdmin = userData.is_admin;
+                currentRole = userData.role;
+
+                // Determine available roles
+                userRoles = [];
+                if (isAdmin) userRoles.push('admin');
+                if (userData.role === 'teacher' || isAdmin) userRoles.push('teacher');
+                if (userData.role === 'parent') userRoles.push('parent');
+                if (userData.role === 'student') userRoles.push('student');
+
+                // If admin, always start with admin interface
+                if (isAdmin) currentRole = 'admin';
+
+                document.getElementById('user-info').textContent = (userData.full_name || userName) + ' (' + currentRole + (isAdmin ? ' 👑' : '') + ')';
+
+                // Show role switcher if multiple roles
+                if (userRoles.length > 1) {
+                    const switcher = document.getElementById('role-switcher');
+                    switcher.style.display = 'flex';
+                    const roleLabels = { admin: '👑 Админ', teacher: '👨‍🏫 Учитель', parent: '👨‍👧 Родитель', student: '📖 Ученик' };
+                    switcher.innerHTML = userRoles.map(r =>
+                        `<button class="role-btn ${r === currentRole ? 'active' : ''}" data-role="${r}" onclick="switchRole('${r}')">${roleLabels[r]}</button>`
+                    ).join('');
+                }
+
+                // Initialize current role interface
+                await switchRole(currentRole);
+
+                log('Success!', 'info');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (e) {
+                log('Error: ' + e.message, 'error');
+                showError(e.message);
+            }
         }
 
         log('Calling initApp...');
