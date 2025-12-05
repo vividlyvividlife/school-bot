@@ -1107,9 +1107,9 @@
                 });
                 const roleNames = { teacher: 'Учителя', parent: 'Родителя', student: 'Ученика', admin: 'Админа' };
                 document.getElementById('invite-result-info').textContent = 'Для ' + (roleNames[role] || role) + ': ' + fullName;
-                const roleNames = { teacher: 'Учителя', parent: 'Родителя', student: 'Ученика', admin: 'Админа' };
-                document.getElementById('invite-result-info').textContent = 
-                    'Для ' + (roleNames[role] || role) + ': ' + fullName;
+
+
+
                 document.getElementById('generated-code').textContent = result.code;
                 document.getElementById('invite-form').style.display = 'none';
                 document.getElementById('invite-result').style.display = 'block';
