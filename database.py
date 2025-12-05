@@ -355,10 +355,16 @@ class Database:
     # ============ SUBJECT METHODS ============
     
     def add_subject(self, name: str, teacher_id: int, max_grade: int = 10) -> Optional[int]:
-        """Добавление предмета"""
+        """Добавление предмета (с проверкой на дубликат)"""
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
+            # Проверка на дубликат
+            cursor.execute('SELECT subject_id FROM subjects WHERE LOWER(name) = LOWER(?)', (name,))
+            if cursor.fetchone():
+                conn.close()
+                logger.warning(f"Subject '{name}' already exists")
+                return None
             cursor.execute(
                 'INSERT INTO subjects (name, teacher_id, max_grade) VALUES (?, ?, ?)',
                 (name, teacher_id, max_grade)

@@ -272,7 +272,7 @@ async def api_add_subject(request):
         if subject_id:
             return web.json_response({'success': True, 'data': {'subject_id': subject_id}})
         else:
-            return web.json_response({'success': False, 'error': 'Failed to add subject'}, status=500)
+            return web.json_response({'success': False, 'error': 'Предмет с таким названием уже существует'}, status=409)
     except Exception as e:
         logger.error(f"Error adding subject: {e}")
         return web.json_response({'success': False, 'error': str(e)}, status=500)
