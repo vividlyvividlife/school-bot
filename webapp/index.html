@@ -148,7 +148,7 @@
 
         /* Sections */
         .section {
-            background: #f8f9fa;
+            background: var(--tg-theme-secondary-bg-color, rgba(128, 128, 128, 0.1));
             border-radius: var(--border-radius);
             padding: 16px;
             margin-bottom: 16px;
@@ -167,6 +167,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--tg-theme-text-color);
         }
 
         .section-badge {
@@ -183,7 +184,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px;
-            background: white;
+            background: var(--tg-theme-bg-color);
+            border: 1px solid rgba(128, 128, 128, 0.2);
             border-radius: 8px;
             margin-bottom: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -195,6 +197,7 @@
 
         .list-item-title {
             font-weight: 500;
+            color: var(--tg-theme-text-color);
         }
 
         .list-item-subtitle {
@@ -212,7 +215,7 @@
             height: 32px;
             border: none;
             border-radius: 50%;
-            background: #e0e0e0;
+            background: var(--tg-theme-secondary-bg-color, rgba(128, 128, 128, 0.2));
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -220,7 +223,7 @@
         }
 
         .icon-btn.danger {
-            background: #ffebee;
+            background: rgba(244, 67, 54, 0.15);
             color: var(--danger-color);
         }
 
@@ -247,7 +250,7 @@
         }
 
         .modal {
-            background: white;
+            background: var(--tg-theme-bg-color);
             border-radius: var(--border-radius);
             padding: 24px;
             width: 90%;
@@ -260,6 +263,7 @@
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 16px;
+            color: var(--tg-theme-text-color);
         }
 
         .form-group {
@@ -271,15 +275,18 @@
             font-size: 14px;
             font-weight: 500;
             margin-bottom: 4px;
+            color: var(--tg-theme-text-color);
         }
 
         .form-input,
         .form-select {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(128, 128, 128, 0.3);
             border-radius: 8px;
             font-size: 14px;
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
         }
 
         .form-input:focus,
@@ -291,9 +298,10 @@
         .form-checkbox-group {
             max-height: 200px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(128, 128, 128, 0.3);
             border-radius: 8px;
             padding: 8px;
+            background: var(--tg-theme-bg-color);
         }
 
         .form-checkbox-item {
@@ -305,7 +313,7 @@
         }
 
         .form-checkbox-item:hover {
-            background: #f5f5f5;
+            background: var(--tg-theme-secondary-bg-color, rgba(128, 128, 128, 0.1));
             border-radius: 4px;
         }
 
@@ -331,8 +339,8 @@
         }
 
         .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
+            background: var(--tg-theme-secondary-bg-color, rgba(128, 128, 128, 0.2));
+            color: var(--tg-theme-text-color);
         }
 
         .btn:hover {
@@ -341,7 +349,7 @@
 
         /* Invite Code Display */
         .invite-code-display {
-            background: #e8f5e9;
+            background: rgba(76, 175, 80, 0.15);
             border-radius: 8px;
             padding: 16px;
             text-align: center;
@@ -452,7 +460,7 @@
         }
 
         .statistics {
-            background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+            background: var(--tg-theme-secondary-bg-color, rgba(128, 128, 128, 0.1));
             padding: 20px;
             border-radius: var(--border-radius);
             margin-bottom: 24px;
@@ -466,7 +474,7 @@
 
         .error {
             padding: 20px;
-            background-color: #ffebee;
+            background-color: rgba(244, 67, 54, 0.15);
             color: var(--danger-color);
             border-radius: var(--border-radius);
             text-align: center;
