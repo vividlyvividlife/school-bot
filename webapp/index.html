@@ -841,11 +841,11 @@
 
         // ========== LOGGING ==========
         function log(msg, type) {
-            const line = document.createElement('div');
-            line.className = type || '';
-            line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
-            debugLog.appendChild(line);
-            debugLog.scrollTop = debugLog.scrollHeight;
+            // const line = document.createElement('div');
+            // line.className = type || '';
+            // line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+            // debugLog.appendChild(line);
+            // debugLog.scrollTop = debugLog.scrollHeight;
             console.log(msg);
         }
 
@@ -1505,14 +1505,14 @@
                     switcher.style.display = 'flex';
                     const roleLabels = { admin: '👑 Админ', teacher: '👨‍🏫 Учитель', parent: '👨‍👧 Родитель', student: '📖 Ученик' };
                     switcher.innerHTML = userRoles.map(r =>
-                        `< button class= "role-btn ${r === currentRole ? 'active' : ''}" data - role="${r}" onclick = "switchRole('${r}')" > ${roleLabels[r]}</button >`
+                        `<button class="role-btn ${r === currentRole ? 'active' : ''}" data-role="${r}" onclick="switchRole('${r}')">${roleLabels[r]}</button>`
                     ).join('');
                 }
 
                 // Initialize current role interface
                 await switchRole(currentRole);
 
-                log('Success!', 'info');
+                // log('Success!', 'info');
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
             } catch (e) {
