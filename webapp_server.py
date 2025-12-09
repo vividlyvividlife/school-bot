@@ -252,9 +252,19 @@ async def api_get_parent_students(request):
         logger.error(f"Error getting parent students: {e}")
         return web.json_response({'success': False, 'error': str(e)}, status=500)
 
-
-
-
+async def api_delete_subject(request):
+    """Удаление предмета"""
+    subject_id = int(request.match_info['subject_id'])
+    logger.info(f"API: DELETE /api/subjects/{subject_id}")
+    try:
+        success = await asyncio.to_thread(db.delete_subject, subject_id)
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to delete subject'}, status=500)
+    except Exception as e:
+        logger.error(f"Error deleting subject: {e}")
+        return web.json_response({'success': False, 'error': str(e)}, status=500)
 
 async def api_add_subject(request):
     """Создание предмета"""
@@ -578,6 +588,7 @@ def create_webapp_server(host='0.0.0.0', port=8080):
         app.router.add_get('/api/students/{student_id}', api_get_student),
         app.router.add_delete('/api/students/{student_id}', api_delete_student),
         app.router.add_get('/api/subjects', api_get_subjects),
+        app.router.add_delete('/api/subjects/{subject_id}', api_delete_subject),
         app.router.add_get('/api/grades', api_get_grades),
         app.router.add_post('/api/grades', api_add_grade),
         app.router.add_put('/api/grades/{grade_id}', api_update_grade),

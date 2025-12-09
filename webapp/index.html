@@ -875,8 +875,10 @@
             async deleteStudent(id) { return await this.request('DELETE', '/api/students/' + id); },
 
             // Subjects
+            // Subjects
             async getSubjects() { return await this.request('GET', '/api/subjects'); },
             async addSubject(data) { return await this.request('POST', '/api/subjects', data); },
+            async deleteSubject(id) { return await this.request('DELETE', '/api/subjects/' + id); },
 
             // Grades
             async getGrades(sid) { return await this.request('GET', '/api/grades?student_id=' + sid); },
@@ -1019,6 +1021,17 @@
                 loadAdminData();
             } catch (e) {
                 alert('Ошибка: ' + e.message);
+            }
+        }
+
+        async function deleteSubject(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот предмет?')) return;
+            if (!confirm('Это действие удалит предмет и может повлиять на оценки. Продолжить?')) return;
+            try {
+                await API.deleteSubject(id);
+                loadAdminData();
+            } catch (e) {
+                alert('Ошибка при удалении: ' + e.message);
             }
         }
 
@@ -1326,6 +1339,7 @@
                                 <div class="list-item-title">${s.name}</div>
                                 <div class="list-item-subtitle">Максимум: ${s.max_grade}</div>
                             </div>
+                            <button class="icon-btn danger" onclick="deleteSubject(${s.subject_id})">🗑</button>
                         </div>
                     `).join('');
                 }
@@ -1491,7 +1505,7 @@
                     switcher.style.display = 'flex';
                     const roleLabels = { admin: '👑 Админ', teacher: '👨‍🏫 Учитель', parent: '👨‍👧 Родитель', student: '📖 Ученик' };
                     switcher.innerHTML = userRoles.map(r =>
-                        `<button class="role-btn ${r === currentRole ? 'active' : ''}" data-role="${r}" onclick="switchRole('${r}')">${roleLabels[r]}</button>`
+                        `< button class= "role-btn ${r === currentRole ? 'active' : ''}" data - role="${r}" onclick = "switchRole('${r}')" > ${roleLabels[r]}</button >`
                     ).join('');
                 }
 
